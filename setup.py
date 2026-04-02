@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="sec-api",
-    version="1.0.32",
+    version="1.0.33",
     author="SEC API",
     author_email="support@sec-api.io",
     description="SEC EDGAR Filings API",

@@ -1,20 +1,66 @@
-# SEC API - Access SEC and EDGAR Data with Python
+<!-- # SEC API - Access SEC and EDGAR Data with Python
 
-[![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api) [![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs)
+[![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api) [![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs) -->
 
-**sec-api** is a Python package for searching and accessing the entire SEC EDGAR filings corpus, providing access to petabytes of regulatory data from public and private companies, insiders (directors, board members, etc.), funds (ETFs, hedge funds, etc.), financial advisors, business development companies, and more. It includes:
+# SEC-API.io Python Library
+
+<a href="https://sec-api.io/docs"><img src="https://sec-api.io/favicon.svg" alt="" width="48" align="left"/></a>
+
+**The industry-standard for SEC & EDGAR data**, trusted by the world's largest hedge funds, investment banks, exchanges, law firms, and universities. Developed by PhDs in finance and physics.
+
+<br clear="left"/>
+
+[![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs) [![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api)
+
+- **20+ million EDGAR filings** and **100+ million exhibits** — from investor presentations, credit agreements, M&A, government contracts, and executive employment agreements to board composition and subsidiaries
+- **800,000+ entities, survivorship-bias free** — covers every SEC-regulated filer that ever reported, including delisted companies, dissolved funds, terminated advisors, and entities no longer reporting. From insiders and public/private companies to ETFs, mutual funds, hedge funds, foreign private issuers, BDCs, REITs, shell companies, and more
+- **All 500+ EDGAR form types** — annual and quarterly reports (10-K, 10-Q, 20-F, 40-F), proxy statements (DEF 14A) and voting records, registration statements and prospectuses, and everything in between, including form types no longer in use
+- **Full historical time range** — from 1993 to present, with data updated in real-time
+
+The full API documentation is available at [sec-api.io/docs](https://sec-api.io/docs).
+
+## Quick Start
+
+```bash
+pip install sec-api
+```
+
+**Download EDGAR Filings and Exhibits**
+
+```python
+from sec_api import DownloadApi
+
+# 200+ requests / second per account
+downloadApi = DownloadApi(api_key="YOUR_API_KEY")
+
+filing_url = "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.htm"
+
+data = downloadApi.get_file(filing_url)
+
+print(data[:1000])
+```
+
+Get your free API key on [sec-api.io](https://sec-api.io/signup) and replace `YOUR_API_KEY` with it.
+
+## Feature Overview
 
 **EDGAR Filing Search & Download APIs**
 
-- [SEC Filing Search and Full-Text Search API](#sec-edgar-filings-query-api)
+- [SEC Filing Search API](#sec-edgar-filings-query-api)
+- [Full-Text Search API](#full-text-search-api)
 - [Real-Time Filing Stream API](#sec-edgar-filings-real-time-stream-api)
 - [Download API - Download any SEC filing, exhibit and attached file](#filing--exhibit-download-api)
 - [PDF Generator API - Download SEC filings and exhibits as PDF](#pdf-generator-api)
+- [EDGAR Filings Ingestion Logs API](#edgar-filings-ingestion-logs-api)
 
 **Converter & Extractor APIs**
 
 - [XBRL-to-JSON Converter API + Financial Statements](#xbrl-to-json-converter-api)
 - [10-K/10-Q/8-K Section Extraction API](#10-k10-q8-k-section-extractor-api)
+
+**Bulk Datasets**
+
+- [Bulk Datasets - Download complete EDGAR filing datasets](#bulk-datasets)
 
 **Investment Advisers**
 
@@ -23,9 +69,12 @@
 **Ownership Data APIs**
 
 - [Form 3/4/5 API - Insider Trading Disclosures](#insider-trading-data-api)
+  - [Form 3 - Initial Ownership Statements](#form-3---initial-ownership-statements)
+  - [Form 4 - Changes in Ownership](#form-4---changes-in-ownership)
+  - [Form 5 - Annual Ownership Statements](#form-5---annual-ownership-statements)
 - [Form 144 API - Restricted Stock Sales by Insiders](#form-144-api)
 - [Form 13F API - Institutional Investment Manager Holdings & Cover Pages](#form-13f-institutional-holdings-database)
-- [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d-13g-api)
+- [Form 13D/13G API - Activist and Passive Investor Holdings](#form-13d13g-api)
 - [Form N-PORT API - Mutual Funds, ETFs and Closed-End Fund Holdings](#form-n-port-api)
 
 **Investment Companies**
@@ -52,6 +101,7 @@
 - [Executive Compensation Data API](#executive-compensation-data-api)
 - [Outstanding Shares & Public Float](#outstanding-shares--public-float-api)
 - [Company Subsidiary API](#subsidiary-api)
+- [Audit Fees Data API](#audit-fees-data-api)
 
 **Enforcement Actions, Proceedings, AAERs & SRO Filings**
 
@@ -66,36 +116,9 @@
 - [CUSIP/CIK/Ticker Mapping API](#cusipcikticker-mapping-api)
 - [EDGAR Entities Database API](#edgar-entities-database)
 
-## Data Coverage
-
-- Access to over 18 million SEC EDGAR filings from 1993 to the present
-- Supports all 150+ filing types, including 10-Q, 10-K, Form 4, 8-K, 13-F, S-1, 424B4, and many others. [See the full list of supported form types here.](https://sec-api.io/list-of-sec-filing-types)
-- Real-time access to newly published filings.
-- Includes XBRL-to-JSON converter and parser APIs for extracting standardized financial statements from any 10-K or 10-Q filing.
-- 13F Holdings API provided, allowing real-time monitoring of institutional ownership.
-- Every filing is linked to its corresponding CIK and ticker.
-- All filings available in JSON format — no need for XBRL/XML parsing.
-
-## Overview
-
-- The Query API gives access to all over 18 million SEC EDGAR filings of over 8,000 publicly listed companies, ETFs, hedge funds, mutual funds, and investors dating back to 1993.
-- Connect to the real-time stream API to receive new filings as soon as they are published on SEC EDGAR
-- The Full-Text Search API allows you to search the full text of all filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
-- Free API key available on [sec-api.io](https://sec-api.io)
-
-See the official documentation for more: [sec-api.io/docs](https://sec-api.io/docs)
-
-## Installation
-
-```bash
-pip install sec-api
-```
-
-Get your free API key on [sec-api.io](https://sec-api.io) and replace `YOUR_API_KEY` with it.
-
 ## SEC EDGAR Filings Query API
 
-The Query API allows you to search and filter all 18 million filings and exhibits published on SEC EDGAR using a large set of search parameters. The database behind the Query API includes all EDGAR filing form types published since 1993 and over 800,000 EDGAR filer entities, with new filings being indexed and searchable as soon as they are published on SEC EDGAR.
+The Query API allows you to search and filter all 20 million filings and exhibits published on SEC EDGAR using a large set of search parameters. The database behind the Query API includes all EDGAR filing form types published since 1993 and over 800,000 EDGAR filer entities, with new filings being indexed and searchable as soon as they are published on SEC EDGAR.
 
 You can search filings by ticker, CIK, form type, filing date, SIC code, period of report, series and class IDs, items of 8-K and other filings, and many more. The API returns all filing metadata in a [standardized JSON format](https://sec-api.io/docs/query-api#response-format).
 
@@ -103,7 +126,7 @@ Examples are provided below, in the [official documentation](https://sec-api.io/
 
 ### Examples
 
-The following example retrieves all 10-Q filings filed by TSLA in 2020.
+The following example retrieves all 10-Q filings filed by TSLA in 2025.
 
 ```python
 from sec_api import QueryApi
@@ -111,7 +134,7 @@ from sec_api import QueryApi
 queryApi = QueryApi(api_key="YOUR_API_KEY")
 
 query = {
-  "query": "ticker:TSLA AND filedAt:[2020-01-01 TO 2020-12-31] AND formType:\"10-Q\"",
+  "query": "ticker:TSLA AND filedAt:[2025-01-01 TO 2025-12-31] AND formType:\"10-Q\"",
   "from": "0",
   "size": "10",
   "sort": [{ "filedAt": { "order": "desc" } }]
@@ -121,6 +144,67 @@ filings = queryApi.get_filings(query)
 
 print(filings)
 ```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+  
+```json
+{
+  "total": { "value": 47, "relation": "eq" },
+  "filings": [
+    {
+      "id": "3ba530142cd52e76b7e15cc9000d2c33",
+      "ticker": "TSLA",
+      "formType": "10-Q",
+      "description": "Form 10-Q - Quarterly report [Sections 13 or 15(d)]",
+      "accessionNo": "0001628280-25-045968",
+      "cik": "1318605",
+      "companyNameLong": "Tesla, Inc. (Filer)",
+      "companyName": "Tesla, Inc.",
+      "filedAt": "2025-10-22T21:08:43-04:00",
+      "periodOfReport": "2025-09-30",
+      "linkToHtml": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/0001628280-25-045968-index.htm",
+      "linkToFilingDetails": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.htm",
+      "linkToTxt": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/0001628280-25-045968.txt",
+      "entities": [
+        {
+          "fiscalYearEnd": "1231",
+          "stateOfIncorporation": "TX",
+          "act": "34",
+          "cik": "1318605",
+          "fileNo": "001-34756",
+          "irsNo": "912197729",
+          "companyName": "Tesla, Inc. (Filer)",
+          "type": "10-Q",
+          "sic": "3711 Motor Vehicles & Passenger Car Bodies"
+        }
+      ],
+      "documentFormatFiles": [
+        {
+          "sequence": "1",
+          "size": "1573631",
+          "documentUrl": "https://www.sec.gov/ix?doc=/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.htm",
+          "description": "10-Q",
+          "type": "10-Q"
+        }
+      ],
+      "dataFiles": [
+        {
+          "sequence": "5",
+          "size": "54524",
+          "documentUrl": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.xsd",
+          "description": "XBRL TAXONOMY EXTENSION SCHEMA DOCUMENT",
+          "type": "EX-101.SCH"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/query-api-10q.json)
 
 Find the most recently reported Form 8-K filings that include Item 9.01 "Financial Statements and Exhibits".
 
@@ -135,13 +219,74 @@ query = {
 filings = queryApi.get_filings(query)
 ```
 
+<details>
+  <summary>Example Response (shortened)</summary>
+  
+```json
+{
+  "total": {  "value": 47,  "relation": "eq" },
+  "filings": [
+    {
+      "id": "3ba530142cd52e76b7e15cc9000d2c33",
+      "ticker": "TSLA",
+      "formType": "10-Q",
+      "description": "Form 10-Q - Quarterly report [Sections 13 or 15(d)]",
+      "accessionNo": "0001628280-25-045968",
+      "cik": "1318605",
+      "companyNameLong": "Tesla, Inc. (Filer)",
+      "companyName": "Tesla, Inc.",
+      "filedAt": "2025-10-22T21:08:43-04:00",
+      "periodOfReport": "2025-09-30",
+      "linkToHtml": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/0001628280-25-045968-index.htm",
+      "linkToFilingDetails": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.htm",
+      "linkToTxt": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/0001628280-25-045968.txt",
+      "entities": [
+        {
+          "fiscalYearEnd": "1231",
+          "stateOfIncorporation": "TX",
+          "act": "34",
+          "cik": "1318605",
+          "fileNo": "001-34756",
+          "irsNo": "912197729",
+          "companyName": "Tesla, Inc. (Filer)",
+          "type": "10-Q",
+          "sic": "3711 Motor Vehicles &amp; Passenger Car Bodies",
+          "filmNo": "251411222",
+          "undefined": "04 Manufacturing)"
+        }
+      ],
+      "documentFormatFiles": [
+        {
+          "sequence": "1",
+          "size": "1573631",
+          "documentUrl": "https://www.sec.gov/ix?doc=/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.htm",
+          "description": "10-Q",
+          "type": "10-Q"
+        }
+      ],
+      "dataFiles": [
+        {
+          "sequence": "5",
+          "size": "54524",
+          "documentUrl": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025045968/tsla-20250930.xsd",
+          "description": "XBRL TAXONOMY EXTENSION SCHEMA DOCUMENT",
+          "type": "EX-101.SCH"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/query-api-8k.json)
+
 > See the documentation for more details: https://sec-api.io/docs/query-api
 
 ## Full-Text Search API
 
 Full-text search allows you to search the full text of all EDGAR filings submitted since 2001. The full text of a filing includes all data in the filing itself as well as all attachments (such as exhibits) to the filing.
-
----
 
 The example below returns all 8-K and 10-Q filings and their exhibits, filed between 01-01-2021 and 14-06-2021, that include the exact phrase "LPCN 1154".
 
@@ -162,6 +307,32 @@ filings = fullTextSearchApi.get_filings(query)
 print(filings)
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 3, "relation": "eq" },
+  "filings": [
+    {
+      "accessionNo": "0001104659-21-080527",
+      "cik": "1535955",
+      "companyNameLong": "Lipocine Inc. (LPCN) (CIK 0001535955)",
+      "ticker": "LPCN",
+      "description": "EXHIBIT 99.1",
+      "formType": "8-K",
+      "type": "EX-99.1",
+      "filingUrl": "https://www.sec.gov/Archives/edgar/data/1535955/000110465921080527/tm2119438d1_ex99-1.htm",
+      "filedAt": "2021-06-14"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/full-text-search.json)
+
 > See the documentation for more details: https://sec-api.io/docs/full-text-search-api
 
 ## Filing & Exhibit Download API
@@ -169,9 +340,9 @@ print(filings)
 Download any SEC EDGAR filing, exhibit and attached file in its original format (HTML, XML, JPEG, Excel, text, PDF, etc.). The API supports downloading all EDGAR form types, including 10-K, 10-Q, 8-K, 13-F, S-1, 424B4, and many others published since 1993 and provides access to over 18 million filings and over 100 million exhibits and filing attachments. Download up to 40 files per second.
 
 ```python
-from sec_api import RenderApi
+from sec_api import DownloadApi
 
-renderApi = RenderApi(api_key="YOUR_API_KEY")
+downloadApi = DownloadApi(api_key="YOUR_API_KEY")
 
 # example URLs: SEC filings, exhibits, images, Excel sheets, PDFs
 url_8k_html       = "https://www.sec.gov/Archives/edgar/data/1045810/000104581023000014/nvda-20230222.htm"
@@ -182,16 +353,16 @@ url_excel_file    = "https://www.sec.gov/Archives/edgar/data/1045810/00010458102
 url_pdf_file      = "https://www.sec.gov/Archives/edgar/data/1798925/999999999724004095/filename1.pdf"
 url_image_file    = "https://www.sec.gov/Archives/edgar/data/1424404/000106299324017776/form10kxz001.jpg"
 
-filing_8k_html = renderApi.get_file(url_8k_html)
-filing_8k_txt  = renderApi.get_file(url_8k_txt)
-exhibit99      = renderApi.get_file(url_exhibit99)
-xbrl_instance  = renderApi.get_file(url_xbrl_instance)
+filing_8k_html = downloadApi.get_file(url_8k_html)
+filing_8k_txt  = downloadApi.get_file(url_8k_txt)
+exhibit99      = downloadApi.get_file(url_exhibit99)
+xbrl_instance  = downloadApi.get_file(url_xbrl_instance)
 
 # use .get_file() and set return_binary=True
 # to get non-text files such as images, PDFs, etc.
-excel_file     = renderApi.get_file(url_excel_file, return_binary=True)
-pdf_file       = renderApi.get_file(url_pdf_file, return_binary=True)
-image_file     = renderApi.get_file(url_image_file, return_binary=True)
+excel_file     = downloadApi.get_file(url_excel_file, return_binary=True)
+pdf_file       = downloadApi.get_file(url_pdf_file, return_binary=True)
+image_file     = downloadApi.get_file(url_image_file, return_binary=True)
 
 # save files to disk
 with open("filing_8k_html.htm", "wb") as f:
@@ -357,9 +528,8 @@ xbrl_json = xbrlApi.xbrl_to_json(
 xbrl_json = xbrlApi.xbrl_to_json(accession_no="0001564590-21-004599")
 ```
 
-### Example Response
-
-Note: response is shortened.
+<details>
+  <summary>Example Response (shortened)</summary>
 
 ```json
 {
@@ -459,13 +629,18 @@ Note: response is shortened.
 }
 ```
 
+</details>
+
 > See the documentation for more details: https://sec-api.io/docs/xbrl-to-json-converter-api
 
 ## 10-K/10-Q/8-K Section Extractor API
 
 The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. The extracted section is cleaned and standardized - in raw text or in standardized HTML. You can programmatically extract one or multiple sections from any 10-Q, 10-K and 8-K filing.
 
-**All 10-K sections can be extracted:**
+Supported sections:
+
+<details>
+  <summary>10-K Sections</summary>
 
 - 1 - Business
 - 1A - Risk Factors
@@ -487,27 +662,31 @@ The Extractor API returns individual sections from 10-Q, 10-K and 8-K filings. T
 - 12 - Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters
 - 13 - Certain Relationships and Related Transactions, and Director Independence
 - 14 - Principal Accountant Fees and Services
+- 15 - Exhibits and Financial Statement Schedules
 
-**All 10-Q sections can be extracted:**
+</details>
 
-Part 1:
+<details>
+  <summary>10-Q Sections</summary>
 
-- 1 - Financial Statements
-- 2 - Management’s Discussion and Analysis of Financial Condition and Results of Operations
-- 3 - Quantitative and Qualitative Disclosures About Market Risk
-- 4 - Controls and Procedures
+- **Part 1:**
+  - 1 - Financial Statements
+  - 2 - Management’s Discussion and Analysis of Financial Condition and Results of Operations
+  - 3 - Quantitative and Qualitative Disclosures About Market Risk
+  - 4 - Controls and Procedures
 
-Part 2:
+- **Part 2:**
+  - 1 - Legal Proceedings
+  - 1A - Risk Factors
+  - 2 - Unregistered Sales of Equity Securities and Use of Proceeds
+  - 3 - Defaults Upon Senior Securities
+  - 4 - Mine Safety Disclosures
+  - 5 - Other Information
+  - 6 - Exhibits
 
-- 1 - Legal Proceedings
-- 1A - Risk Factors
-- 2 -Unregistered Sales of Equity Securities and Use of Proceeds
-- 3 - Defaults Upon Senior Securities
-- 4 - Mine Safety Disclosures
-- 5 - Other Information
-- 6 - Exhibits
-
-**All 8-K sections can be extracted:**
+</details>
+<details>
+  <summary>8-K Sections</summary>
 
 - 1.01: Entry into a Material Definitive Agreement
 - 1.02: Termination of a Material Definitive Agreement
@@ -523,13 +702,13 @@ Part 2:
 - 3.01: Notice of Delisting or Failure to Satisfy a Continued Listing Rule or Standard; Transfer of Listing
 - 3.02: Unregistered Sales of Equity Securities
 - 3.03: Material Modifications to Rights of Security Holders
-- 4.01: Changes in Registrant's Certifying Accountant
+- 4.01: Changes in Registrant’s Certifying Accountant
 - 4.02: Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review
 - 5.01: Changes in Control of Registrant
 - 5.02: Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers: Compensatory Arrangements of Certain Officers
 - 5.03: Amendments to Articles of Incorporation or Bylaws; Change in Fiscal Year
-- 5.04: Temporary Suspension of Trading Under Registrant's Employee Benefit Plans
-- 5.05: Amendments to the Registrant's Code of Ethics, or Waiver of a Provision of the Code of Ethics
+- 5.04: Temporary Suspension of Trading Under Registrant’s Employee Benefit Plans
+- 5.05: Amendments to the Registrant’s Code of Ethics, or Waiver of a Provision of the Code of Ethics
 - 5.06: Change in Shell Company Status
 - 5.07: Submission of Matters to a Vote of Security Holders
 - 5.08: Shareholder Nominations Pursuant to Exchange Act Rule 14a-11
@@ -544,6 +723,8 @@ Part 2:
 - 8.01: Other Events
 - 9.01: Financial Statements and Exhibits
 - Signature
+
+</details>
 
 ### Usage
 
@@ -584,9 +765,29 @@ extracted_section_8k = extractorApi.get_section(filing_url_8k, "1-1", "text")
 
 > See the documentation for more details: https://sec-api.io/docs/sec-filings-item-extraction-api
 
+## Bulk Datasets
+
+Download complete datasets for offline analysis and large-scale processing. All datasets are updated daily between 10:30 PM and 11:30 PM EST. Browse all available datasets at [sec-api.io/datasets](https://sec-api.io/datasets).
+
+| Dataset                                             | Form Types                  | Coverage     | Format               |
+| --------------------------------------------------- | --------------------------- | ------------ | -------------------- |
+| Form 10-K - Annual Reports                          | 10-K, 10-K/A, 10-KSB, 10-KT | 1993-present | ZIP (HTML, TXT)      |
+| Form 10-Q - Quarterly Reports                       | 10-Q, 10-Q/A                | 1993-present | ZIP (HTML, TXT)      |
+| Form 8-K Exhibit 99 - Press Releases                | 8-K, 8-K/A                  | 1994-present | ZIP (HTML, TXT, PDF) |
+| Earnings Results (Item 2.02)                        | 8-K, 8-K/A                  | 2004-present | ZIP (HTML, TXT, PDF) |
+| Form 3 - Initial Ownership                          | 3, 3/A                      | 2009-present | JSONL                |
+| Form 4 - Changes in Ownership                       | 4, 4/A                      | 2009-present | JSONL                |
+| Form 5 - Annual Ownership                           | 5, 5/A                      | 2009-present | JSONL                |
+| Form 13F - Institutional Holdings                   | 13F-HR, 13F-HR/A            | 2013-present | JSONL                |
+| Form N-PORT - Fund Holdings                         | NPORT, NPORT/A              | 2019-present | JSONL                |
+| Form DEF 14A - Proxy Statements                     | DEF 14A                     | 1994-present | ZIP (HTML, TXT)      |
+| [View all datasets...](https://sec-api.io/datasets) |                             |              |                      |
+
 ## Form ADV API
 
-Search the entire Form ADV filing database and find all ADV filings filed by firm advisers (SEC and state registered), individual advisers and firm brochures published in part 2 of ADV filings. The database comprises 41,000 ADV filings filed by advisory firms and 380,000 individual advisers and is updated daily. Search and find ADV filings by any filing property, such as CRD, assets under management, type of adviser (e.g. broker dealer) and more. Direct owners from Schedule A, indirect owners from Schedule B as well as private funds from Schedule D are easily accessible.
+Search and access Form ADV data for registered investment advisers, including firm information, individual advisors, direct/indirect owners, private fund data, and brochures.
+
+### Search Advisory Firms
 
 ```python
 from sec_api import FormAdvApi
@@ -602,16 +803,54 @@ response = formAdvApi.get_firms(
     }
 )
 print(response["filings"])
+```
 
-direct_owners = formAdvApi.get_direct_owners(crd="793")
-print(direct_owners)
+<details>
+  <summary>Example Response (shortened)</summary>
 
-indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
-print(indirect_owners)
+```json
+{
+  "total": { "value": 1, "relation": "eq" },
+  "filings": [
+    {
+      "Info": {
+        "SECRgnCD": "NYRO",
+        "FirmCrdNb": 361,
+        "SECNb": "801-16048",
+        "BusNm": "GOLDMAN SACHS & CO. LLC",
+        "LegalNm": "GOLDMAN SACHS & CO. LLC"
+      },
+      "MainAddr": {
+        "Strt1": "200 WEST STREET",
+        "City": "NEW YORK",
+        "State": "NY",
+        "Cntry": "United States",
+        "PostlCd": "10282",
+        "PhNb": "212-902-1000"
+      },
+      "Rgstn": [
+        { "FirmType": "Registered", "St": "APPROVED", "Dt": "1981-05-13" }
+      ],
+      "FormInfo": {
+        "Part1A": {
+          "Item1": { "Q1F5": 18, "Q1ODesc": "More than $50 billion" },
+          "Item5A": { "TtlEmp": 2268 },
+          "Item5F": { "Q5F2C": 133644228926, "Q5F2F": 46269 }
+        }
+      },
+      "id": 361
+    }
+  ]
+}
+```
 
-private_funds = formAdvApi.get_private_funds(crd="793")
-print(private_funds)
+</details>
 
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-firms.json)
+
+### Search Individual Advisors
+
+```python
 response = formAdvApi.get_individuals(
     {
         "query": "CrntEmps.CrntEmp.orgPK:149777",
@@ -621,86 +860,656 @@ response = formAdvApi.get_individuals(
     }
 )
 print(response["filings"])
+```
 
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "filings": [
+    {
+      "Info": {
+        "lastNm": "Nebot",
+        "firstNm": "Roman",
+        "indvlPK": 8213636,
+        "actvAGReg": "Y",
+        "link": "https://adviserinfo.sec.gov/individual/summary/8213636"
+      },
+      "CrntEmps": {
+        "CrntEmp": [
+          {
+            "orgNm": "MORGAN STANLEY",
+            "orgPK": 149777,
+            "CrntRgstns": {
+              "CrntRgstn": [
+                {
+                  "regAuth": "FL",
+                  "regCat": "RA",
+                  "st": "APPROVED",
+                  "stDt": "2026-02-02"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "Exms": {
+        "Exm": [
+          {
+            "exmCd": "S66",
+            "exmNm": "Uniform Combined State Law Examination",
+            "exmDt": "2025-12-08"
+          }
+        ]
+      },
+      "id": 8213636
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-individuals.json)
+
+### Get Direct Owners (Schedule A)
+
+```python
+direct_owners = formAdvApi.get_direct_owners(crd="793")
+print(direct_owners)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "name": "ZEMLYAK, JAMES MARK",
+    "ownerType": "I",
+    "titleStatus": "EXECUTIVE VICE PRESIDENT & DIRECTOR",
+    "dateTitleStatusAcquired": "2002-08",
+    "ownershipCode": "NA",
+    "isControlPerson": true,
+    "isPublicReporting": false,
+    "crd": "1586132"
+  },
+  {
+    "name": "STIFEL FINANCIAL CORP.",
+    "ownerType": "DE",
+    "titleStatus": "SHAREHOLDER",
+    "dateTitleStatusAcquired": "1982-02",
+    "ownershipCode": "E",
+    "isControlPerson": true,
+    "isPublicReporting": true
+  }
+]
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-direct-owners.json)
+
+### Get Indirect Owners (Schedule B)
+
+```python
+indirect_owners = formAdvApi.get_indirect_owners(crd="326262")
+print(indirect_owners)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "name": "CORIENT PARTNERS LLC",
+    "ownerType": "DE",
+    "entityOwned": "CORIENT PRIVATE WEALTH LLC",
+    "status": "OWNER",
+    "dateStatusAcquired": "2022-02",
+    "ownershipCode": "E",
+    "isControlPerson": true,
+    "isPublicReporting": false,
+    "crd": ""
+  },
+  {
+    "name": "CI FINANCIAL CORP.",
+    "ownerType": "FE",
+    "entityOwned": "CORIENT HOLDINGS INC",
+    "status": "OWNER",
+    "dateStatusAcquired": "2019-11",
+    "ownershipCode": "E",
+    "isControlPerson": true,
+    "isPublicReporting": false,
+    "crd": ""
+  }
+]
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-indirect-owners.json)
+
+### Get Other Business Names (Schedule D, Section 1.B)
+
+```python
+other_business_names = formAdvApi.get_other_business_names(crd="149777")
+print(other_business_names)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "name": "MORGAN STANLEY SMITH BARNEY",
+    "jurisdictions": [
+      "AL",
+      "AK",
+      "AZ",
+      "AR",
+      "CA",
+      "CO",
+      "CT",
+      "DE",
+      "DC",
+      "FL"
+    ]
+  },
+  {
+    "name": "MORGAN STANLEY WEALTH MANAGEMENT",
+    "jurisdictions": [
+      "AL",
+      "AK",
+      "AZ",
+      "AR",
+      "CA",
+      "CO",
+      "CT",
+      "DE",
+      "DC",
+      "FL"
+    ]
+  }
+]
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-other-business-names.json)
+
+### Get Separately Managed Accounts (Schedule D, Section 5.K)
+
+Retrieve details about separately managed accounts, including asset type distributions, borrowings, derivative exposures, and custodians.
+
+```python
+separately_managed_accounts = formAdvApi.get_separately_managed_accounts(crd="149777")
+print(separately_managed_accounts)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+{
+  "1-separatelyManagedAccounts": {
+    "a": {
+      "i-exchangeTradedEquity": { "midYear": "58 %", "endOfYear": "58 %" },
+      "ii-nonExchangeTradedEquity": { "midYear": "0 %", "endOfYear": "0 %" },
+      "iii-usGovernmentBonds": { "midYear": "2 %", "endOfYear": "2 %" }
+    }
+  },
+  "2-borrowingsAndDerivatives": {
+    "a-i-midYear": {
+      "regulatoryAssetsUnderManagement": {
+        "lessThan10": "$ 1,556,490,216,199",
+        "between10And149": "$ 113,832,393,489",
+        "moreThan150": "$ 16,522,479,023"
+      },
+      "borrowings": {
+        "lessThan10": "$ 1,640,415,435",
+        "between10And149": "$ 53,635,978,014",
+        "moreThan150": "$ 67,201,944,992"
+      }
+    }
+  },
+  "3-custodiansForSeparatelyManagedAccounts": [
+    {
+      "a-legalName": "MORGAN STANLEY SMITH BARNEY LLC",
+      "b-businessName": "MORGAN STANLEY",
+      "d-isRelatedPerson": true,
+      "g-amountHeldAtCustodian": "$ 1,733,996,722,410"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-separately-managed-accounts.json)
+
+### Get Financial Industry Affiliations (Schedule D, Section 7.A)
+
+Retrieve related persons and financial industry affiliations, such as affiliated broker-dealers, investment advisers, insurance companies, and pooled investment vehicle sponsors.
+
+```python
+financial_industry_affiliations = formAdvApi.get_financial_industry_affiliations(crd="149777")
+print(financial_industry_affiliations)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "1-nameOfRelatedPerson": "MS CAPITAL PARTNERS ADVISER INC.",
+    "2-businessName": "MS CAPITAL PARTNERS ADVISER INC.",
+    "3-secFileNumber": "80169426",
+    "4a-crdNumber": "147521",
+    "5-typesOfRelatedPerson": ["b-otherAdviser", "f-commodityPoolOperator"],
+    "6-controlsRelatedPerson": false,
+    "7-underCommonControl": false,
+    "8a-relatedPersonActsAsCustodian": false,
+    "9a-exemptFromRegistration": false,
+    "11-shareSupervisedPersons": true,
+    "12-shareSameLocation": false
+  }
+]
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-financial-industry-affiliations.json)
+
+### Get Private Funds (Schedule D, Section 7.B.1)
+
+```python
+private_funds = formAdvApi.get_private_funds(crd="793")
+print(private_funds)
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "1a-nameOfFund": "EI FUND II LLC",
+    "1b-fundIdentificationNumber": "805-4502496130",
+    "2-lawOrganizedUnder": { "state": "Missouri", "country": "United States" },
+    "3a-namesOfGeneralPartnerManagerTrusteeDirector": [
+      "STIFEL NICOLAUS & COMPANY, INC."
+    ],
+    "6c-isFeederFundInMasterFeederAgreement": true,
+    "6d-nameIdOfMasterFund": "EI FUND V, LP",
+    "10-typeOfFund": {
+      "selectedTypes": ["other private fund"],
+      "otherFundType": "FEEDER INTO PRIVATE EQUITY FUND"
+    },
+    "11-grossAssetValue": 2027469,
+    "12-minInvestmentCommitment": 100000,
+    "13-numberOfBeneficialOwners": 25
+  }
+]
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-private-funds.json)
+
+### Get Brochures
+
+```python
 response = formAdvApi.get_brochures(149777)
 print(response["brochures"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "brochures": [
+    {
+      "versionId": 1033575,
+      "name": "CONSULTING GROUP ADVISOR PROGRAM BROCHURE",
+      "dateSubmitted": "2026-03-30",
+      "url": "https://files.adviserinfo.sec.gov/IAPD/Content/Common/crd_iapd_Brochure.aspx?BRCHR_VRSN_ID=1033575"
+    },
+    {
+      "versionId": 1033576,
+      "name": "PORTFOLIO MANAGEMENT AND INSTITUTIONAL CASH ADVISORY PROGRAM BROCHURE",
+      "dateSubmitted": "2026-03-30",
+      "url": "https://files.adviserinfo.sec.gov/IAPD/Content/Common/crd_iapd_Brochure.aspx?BRCHR_VRSN_ID=1033576"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-adv-brochures.json)
 
 > See the documentation for more details: https://sec-api.io/docs/investment-adviser-and-adv-api
 
 ## Insider Trading Data API
 
-The Insider Trading Data API allows you to search and list all insider buy and sell transactions of all publicly listed companies on US stock exchanges. Insider activities of company directors, officers, 10% owners and other executives are fully searchable. The insider trading database includes information about the CIK and name of the insider, her/his relationship to the company, the number of shares and securities purchased or sold, the purchase or selling price, the date of the transaction, the amount of securities held before and after the transaction occured, any footnotes such as the effect of Rule 10b-18 or 10b5-1 stock purchase plans and more. The full list of all data points is available below.
+Access Form 3, 4, and 5 filings that disclose insider ownership and trading activity by company officers, directors, and beneficial owners.
+
+### Form 3 - Initial Ownership Statements
 
 ```python
 from sec_api import InsiderTradingApi
 
 insiderTradingApi = InsiderTradingApi("YOUR_API_KEY")
 
-insider_trades = insiderTradingApi.get_data({
-  "query": "issuer.tradingSymbol:TSLA"
+data = insiderTradingApi.get_data({
+    "query": "documentType:3 AND issuer.tradingSymbol:NTB",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
 })
-
-print(insider_trades["transactions"])
+print(data["transactions"])
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/insider-ownership-trading-api
-
-### Response Example
+<details>
+  <summary>Example Response</summary>
 
 ```json
-[
-  {
-    "accessionNo": "0000899243-22-028189",
-    "filedAt": "2022-08-09T21:23:00-04:00",
-    "documentType": "4",
-    "periodOfReport": "2022-08-09",
-    "issuer": {
-      "cik": "1318605",
-      "name": "Tesla, Inc.",
-      "tradingSymbol": "TSLA"
-    },
-    "reportingOwner": {
-      "cik": "1494730",
-      "name": "Musk Elon",
-      "address": {
-        "street1": "C/O TESLA, INC.",
-        "street2": "1 TESLA ROAD",
-        "city": "AUSTIN",
-        "state": "TX",
-        "zipCode": "78725"
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "transactions": [
+    {
+      "id": "9ec6b4513d930d643aa7bd45821be7ab",
+      "accessionNo": "0001975035-26-000012",
+      "filedAt": "2026-04-01T08:46:43-04:00",
+      "schemaVersion": "X0607",
+      "documentType": "3",
+      "periodOfReport": "2026-03-31",
+      "notSubjectToSection16": false,
+      "issuer": {
+        "cik": "1653242",
+        "name": "Bank of N.T. Butterfield & Son Ltd",
+        "tradingSymbol": "NTB"
       },
-      "relationship": {
-        "isDirector": true,
-        "isOfficer": true,
-        "officerTitle": "CEO",
-        "isTenPercentOwner": true,
-        "isOther": false
-      }
-    },
-    "nonDerivativeTable": {
-      "transactions": [
-        {
-          "securityTitle": "Common Stock",
-          "transactionDate": "2022-08-09",
-          "coding": {
-            "formType": "4",
-            "code": "S",
-            "equitySwapInvolved": false
-          },
-          "amounts": {
-            "shares": 435,
-            "pricePerShare": 872.469,
-            "pricePerShareFootnoteId": ["F1"],
-            "acquiredDisposedCode": "D"
-          }
+      "reportingOwner": {
+        "cik": "2120720",
+        "name": "Henton Andrew Michael",
+        "address": {
+          "street1": "59 FRONT STREET",
+          "city": "HAMILTON",
+          "zipCode": "HM 12"
+        },
+        "relationship": {
+          "isDirector": true,
+          "isOfficer": false,
+          "isTenPercentOwner": false,
+          "isOther": false
         }
-      ]
-      // and many more
+      },
+      "nonDerivativeTable": {
+        "holdings": [
+          {
+            "securityTitle": "Bank of N.T. Butterfield & Son Ltd",
+            "coding": {},
+            "postTransactionAmounts": {
+              "sharesOwnedFollowingTransaction": 667
+            },
+            "ownershipNature": {
+              "directOrIndirectOwnership": "D"
+            }
+          }
+        ]
+      },
+      "ownerSignatureName": "Tara Hidalgo, by power of attorney for Andr",
+      "ownerSignatureNameDate": "2026-04-01"
     }
-  }
-]
+  ]
+}
 ```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/insider-trading-form3.json)
+
+### Form 4 - Changes in Ownership
+
+```python
+data = insiderTradingApi.get_data({
+    "query": "documentType:4 AND issuer.tradingSymbol:TSLA",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+})
+print(data["transactions"])
+```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 837, "relation": "eq" },
+  "transactions": [
+    {
+      "id": "b5e3ff9eca7a16f1b7fef6aef6767fbc",
+      "accessionNo": "0001104659-26-025379",
+      "filedAt": "2026-03-09T19:00:14-04:00",
+      "schemaVersion": "X0508",
+      "documentType": "4",
+      "periodOfReport": "2026-03-05",
+      "notSubjectToSection16": false,
+      "issuer": {
+        "cik": "1318605",
+        "name": "Tesla, Inc.",
+        "tradingSymbol": "TSLA"
+      },
+      "reportingOwner": {
+        "cik": "1771340",
+        "name": "Taneja Vaibhav",
+        "address": {
+          "street1": "C/O TESLA, INC.",
+          "street2": "1 TESLA ROAD",
+          "city": "AUSTIN",
+          "state": "TX",
+          "zipCode": "78725"
+        },
+        "relationship": {
+          "isDirector": false,
+          "isOfficer": true,
+          "officerTitle": "Chief Financial Officer",
+          "isTenPercentOwner": false,
+          "isOther": false
+        }
+      },
+      "nonDerivativeTable": {
+        "transactions": [
+          {
+            "securityTitle": "Common Stock",
+            "transactionDate": "2026-03-05",
+            "coding": {
+              "formType": "4",
+              "code": "M",
+              "equitySwapInvolved": false,
+              "footnoteId": ["F1"]
+            },
+            "amounts": {
+              "shares": 6538,
+              "pricePerShare": 0,
+              "acquiredDisposedCode": "A"
+            },
+            "postTransactionAmounts": {
+              "sharesOwnedFollowingTransaction": 20371,
+              "sharesOwnedFollowingTransactionFootnoteId": ["F2"]
+            },
+            "ownershipNature": {
+              "directOrIndirectOwnership": "D"
+            }
+          }
+          // ... more transactions
+        ],
+        "holdings": [
+          {
+            "securityTitle": "Common Stock",
+            "coding": {},
+            "postTransactionAmounts": {
+              "sharesOwnedFollowingTransaction": 111000
+            },
+            "ownershipNature": {
+              "directOrIndirectOwnership": "I",
+              "natureOfOwnership": "See Footnote",
+              "natureOfOwnershipFootnoteId": ["F4"]
+            }
+          }
+        ]
+      },
+      "derivativeTable": {
+        "transactions": [
+          {
+            "securityTitle": "Restricted Stock Unit",
+            "conversionOrExercisePrice": 0,
+            "transactionDate": "2026-03-05",
+            "coding": {
+              "formType": "4",
+              "code": "M",
+              "equitySwapInvolved": false
+            },
+            "exerciseDateFootnoteId": ["F5"],
+            "expirationDateFootnoteId": ["F5"],
+            "underlyingSecurity": {
+              "title": "Common Stock",
+              "shares": 6538
+            },
+            "amounts": {
+              "shares": 6538,
+              "pricePerShare": 0,
+              "acquiredDisposedCode": "D"
+            },
+            "postTransactionAmounts": {
+              "sharesOwnedFollowingTransaction": 65382
+            },
+            "ownershipNature": {
+              "directOrIndirectOwnership": "D"
+            }
+          }
+        ]
+      },
+      "footnotes": [
+        {
+          "id": "F1",
+          "text": "Shares of the Issuer's common stock were issued to the reporting person upon the vesting of restricted stock units on March 5, 2026."
+        }
+        // ... more footnotes
+      ],
+      "ownerSignatureName": "By: Aaron Beckman, Power of Attorney For: Vaibhav Taneja",
+      "ownerSignatureNameDate": "2026-03-09"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/insider-trading-form4.json)
+
+### Form 5 - Annual Ownership Statements
+
+```python
+data = insiderTradingApi.get_data({
+    "query": "documentType:5 AND issuer.tradingSymbol:SPWR",
+    "from": "0",
+    "size": "50",
+    "sort": [{"filedAt": {"order": "desc"}}],
+})
+print(data["transactions"])
+```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "transactions": [
+    {
+      "id": "00101d987e5fd4e6d2bdcd1d9c17b170",
+      "accessionNo": "0001213900-26-031111",
+      "filedAt": "2026-03-18T18:49:54-04:00",
+      "schemaVersion": "X0609",
+      "documentType": "5",
+      "periodOfReport": "2025-12-28",
+      "notSubjectToSection16": false,
+      "issuer": {
+        "cik": "1838987",
+        "name": "SunPower Inc.",
+        "tradingSymbol": "SPWR"
+      },
+      "reportingOwner": {
+        "cik": "1253573",
+        "name": "MAIER LOTHAR",
+        "address": {
+          "street1": "C/O SUNPOWER INC.",
+          "street2": "45600 NORTHPORT LOOP EAST",
+          "city": "FREMONT",
+          "state": "CA",
+          "zipCode": "94538"
+        },
+        "relationship": {
+          "isDirector": true,
+          "isOfficer": false,
+          "isTenPercentOwner": false,
+          "isOther": false
+        }
+      },
+      "nonDerivativeTable": {
+        "transactions": [
+          {
+            "securityTitle": "Common Stock",
+            "transactionDate": "2025-05-23",
+            "coding": {
+              "formType": "4",
+              "code": "A",
+              "equitySwapInvolved": false
+            },
+            "timeliness": "L",
+            "amounts": {
+              "shares": 243169,
+              "pricePerShare": 0,
+              "pricePerShareFootnoteId": ["F1"],
+              "acquiredDisposedCode": "A"
+            },
+            "postTransactionAmounts": {
+              "sharesOwnedFollowingTransaction": 243169
+            },
+            "ownershipNature": {
+              "directOrIndirectOwnership": "D"
+            }
+          }
+        ]
+      },
+      "footnotes": [
+        {
+          "id": "F1",
+          "text": "On May 23, 2025, the Company granted the Reporting Person 243,169 restricted stock units pursuant to the Company's 2023 Equity Incentive Plan, as amended, each of which fully vested into one share of common stock on the grant date."
+        }
+      ],
+      "ownerSignatureName": "/s/ Lothar Maier",
+      "ownerSignatureNameDate": "2026-03-17"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/insider-trading-form5.json)
+
+> See the documentation for more details: https://sec-api.io/docs/insider-ownership-trading-api
 
 ## Form 144 API
 
@@ -722,6 +1531,69 @@ response = form144Api.get_data(search_params)
 
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 72, "relation": "eq" },
+  "data": [
+    {
+      "id": "3196e422cd21d5a12a3acf756bb3e0a1",
+      "accessionNo": "0001950047-26-003078",
+      "fileNo": "001-34756",
+      "formType": "144",
+      "filedAt": "2026-03-30T17:31:46-04:00",
+      "entities": [
+        {
+          "cik": "1318605",
+          "ticker": "TSLA",
+          "companyName": "Tesla, Inc. (Subject)",
+          "type": "144"
+        },
+        { "cik": "1331680", "companyName": "Wilson-Thompson Kathleen (Reporting)", "type": "144" }
+      ],
+      "issuerInfo": {
+        "issuerCik": "1318605",
+        "issuerTicker": "TSLA",
+        "issuerName": "Tesla, Inc.",
+        "secFileNumber": "001-34756",
+        "issuerAddress": {
+          "street1": "1 Tesla Road",
+          "city": "Austin",
+          "stateOrCountry": "TX",
+          "zipCode": "78725"
+        },
+        "nameOfPersonForWhoseAccountTheSecuritiesAreToBeSold": "KATHLEEN WILSON-THOMPSON",
+        "relationshipsToIssuer": "Director"
+      },
+      "securitiesInformation": [
+        {
+          "securitiesClassTitle": "Common",
+          "numberOfUnitsToBeSold": 25809,
+          "aggregateMarketValue": 9338470.47,
+          "approxSaleDate": "2026-03-30",
+          "securitiesExchangeName": "NASDAQ"
+        }
+      ],
+      "securitiesToBeSold": [
+        {
+          "securitiesClassTitle": "Common",
+          "acquiredDate": "2026-03-30",
+          "natureOfAcquisitionTransaction": "Exercise of Stock Options",
+          "nameOfPersonFromWhomAcquired": "Issuer",
+          "amountOfSecuritiesAcquired": 1648
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-144.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-144-restricted-sales-api
 
@@ -747,6 +1619,46 @@ holdings = response["data"]
 print(holdings)
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 209, "relation": "eq" },
+  "data": [
+    {
+      "id": "289428b455d4eb55f298d84f544d3d61",
+      "accessionNo": "0001193125-26-054580",
+      "cik": "1067983",
+      "ticker": "BRK.B",
+      "companyName": "BERKSHIRE HATHAWAY INC",
+      "formType": "13F-HR",
+      "description": "Form 13F-HR - Quarterly report filed by institutional managers, Holdings",
+      "filedAt": "2026-02-17T16:05:04-05:00",
+      "periodOfReport": "2025-12-31",
+      "holdings": [
+        {
+          "nameOfIssuer": "ALLY FINL INC",
+          "cusip": "02005N100",
+          "titleOfClass": "COM",
+          "value": 576074081,
+          "shrsOrPrnAmt": { "sshPrnamt": 12719675, "sshPrnamtType": "SH" },
+          "investmentDiscretion": "DFND",
+          "votingAuthority": { "Sole": 12719675, "Shared": 0, "None": 0 },
+          "otherManager": "4",
+          "ticker": "ALLY",
+          "cik": "40729"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-13f-holdings.json)
+
 > See the documentation for more details: https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
 
 ## Form 13F Cover Pages API
@@ -770,6 +1682,54 @@ cover_pages = response["data"]
 
 print(cover_pages)
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 13, "relation": "eq" },
+  "data": [
+    {
+      "id": "1ef1c3fa0b53c72620f026f0ab47e7c6",
+      "accessionNo": "0001350694-26-000001",
+      "filedAt": "2026-02-13T16:03:50-05:00",
+      "formType": "13F-HR",
+      "cik": "1350694",
+      "crdNumber": "105129",
+      "secFileNumber": "801-35875",
+      "form13FFileNumber": "028-11794",
+      "periodOfReport": "2025-12-31",
+      "isAmendment": false,
+      "filingManager": {
+        "name": "Bridgewater Associates, LP",
+        "address": {
+          "street": "One Nyala Farms Road",
+          "city": "Westport",
+          "stateOrCountry": "CT",
+          "zipCode": 6880
+        }
+      },
+      "reportType": "13F HOLDINGS REPORT",
+      "signature": {
+        "name": "Michael Kitson",
+        "title": "Chief Compliance Officer and Counsel",
+        "phone": "203-226-3030",
+        "signature": "/s/Michael Kitson",
+        "city": "Westport",
+        "stateOrCountry": "CT",
+        "signatureDate": "02-13-2026"
+      },
+      "tableEntryTotal": 1040,
+      "tableValueTotal": 27421613830
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-13f-cover-pages.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-13-f-filings-institutional-holdings-api
 
@@ -795,9 +1755,8 @@ response = form13DGApi.get_data(query)
 print(response["filings"])
 ```
 
-> See the documentation for more details: https://sec-api.io/docs/form-13d-13g-search-api
-
-### Response Example
+<details>
+  <summary>Example Response</summary>
 
 ```json
 {
@@ -851,6 +1810,12 @@ print(response["filings"])
 }
 ```
 
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-13d-13g.json)
+
+> See the documentation for more details: https://sec-api.io/docs/form-13d-13g-search-api
+
 ## Form N-PORT API
 
 Access and find standardized N-PORT SEC filings.
@@ -871,6 +1836,61 @@ response = nportApi.get_data(search_params)
 
 print(response["filings"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "filings": [
+    {
+      "submissionType": "NPORT-P",
+      "filerInfo": {
+        "filer": {
+          "issuerCredentials": { "cik": "0001552947", "ccc": "XXXXXXXX" }
+        },
+        "seriesClassInfo": {
+          "seriesId": "S000075330",
+          "classId": ["C000234270", "C000234271", "C000234272"]
+        }
+      },
+      "genInfo": {
+        "regName": "Two Roads Shared Trust",
+        "seriesName": "Holbrook Structured Credit Income Fund",
+        "seriesId": "S000075330",
+        "repPdEnd": "2026-04-30",
+        "repPdDate": "2026-01-31"
+      },
+      "fundInfo": {
+        "totAssets": 589656494.57,
+        "totLiabs": 26303874.88,
+        "netAssets": 563352619.69
+      },
+      "invstOrSecs": [
+        {
+          "name": "A&D MORTGAGE TRUST 2023-NQM2",
+          "title": "ADMT 2023-NQM2 A1",
+          "cusip": "00002DAA7",
+          "balance": 1287717.11,
+          "units": "PA",
+          "curCd": "USD",
+          "valUSD": 1289380.97,
+          "pctVal": 0.228876360015,
+          "payoffProfile": "Long",
+          "assetCat": "ABS-O",
+          "issuerCat": "CORP",
+          "invCountry": "US"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-nport.json)
 
 > See the documentation for more details: https://sec-api.io/docs/n-port-data-api
 
@@ -894,11 +1914,65 @@ response = formNcenApi.get_data(search_params)
 print(response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "data": [
+    {
+      "id": "8673f62b218d47bba6c85d8c101caba8",
+      "accessionNo": "0001639553-26-000002",
+      "fileNo": "811-23054",
+      "formType": "N-CEN",
+      "filedAt": "2026-03-16T17:18:30-04:00",
+      "periodOfReport": "2025-12-31",
+      "registrantInfo": {
+        "registrantFullName": "Variable Annuity-8 Series Account (of Empower Life & Annuity Insurance Co of New York)",
+        "investmentCompFileNo": "811-23054",
+        "registrantCik": "1639553",
+        "registrantCity": "New York",
+        "registrantState": "NY",
+        "registrantCountry": "US",
+        "registrantClassificationType": "N-4",
+        "chiefComplianceOfficers": [
+          {
+            "ccoName": "Ahmed Abdul-Jaleel",
+            "crdNumber": "008065071",
+            "ccoCity": "Greenwood Village",
+            "ccoState": "CO"
+          }
+        ],
+        "principalUnderwriters": [
+          {
+            "principalUnderwriterName": "Empower Financial Services, Inc.",
+            "principalUnderwriterFileNo": "008-33854"
+          }
+        ],
+        "publicAccountants": [
+          {
+            "publicAccountantName": "Deloitte & Touche LLP",
+            "pcaobNumber": "34"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-ncen.json)
+
 > See the documentation for more details: https://sec-api.io/docs/form-ncen-api-annual-reports-investment-companies
 
 ## Form N-PX Proxy Voting Records API
 
-The Form N-PX API consists of two APIs: the N-PX Search API and the Voting Records API. The N-PX Search API enables filtering all N-PX filings published on the SEC EDGAR database since 2024. The API accepts search queries as JSON formatted payload and returns the matching N-PX filings in JSON format. The Voting Records API allows downloading the proxy voting records in structured JSON format for a specific filing by providing the filing's accession number.
+Access Form N-PX filings that disclose proxy voting records of mutual funds and other registered management investment companies. Use `get_metadata` to search filings and `get_voting_records` to retrieve individual voting records by accession number.
+
+### Search N-PX Filing Metadata
 
 ```python
 from sec_api import FormNPXApi
@@ -912,21 +1986,102 @@ search_params = {
     "sort": [{"filedAt": {"order": "desc"}}],
 }
 
-# get N-PX filing metadata: registrant type, investment company type,
-# series and class IDs, report type, period of report, and more
 response = formNpxApi.get_metadata(search_params)
 npx_filing_metadata = response["data"]
 
 print(npx_filing_metadata)
+```
 
-# get proxy voting records: issuer name, CUSIP, meeting date, vote description,
-# vote categories, shares voted, how voted, management recommendation, and more
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 2, "relation": "eq" },
+  "data": [
+    {
+      "id": "723cc6d725f186bd4436136332d7fc98",
+      "accessionNo": "0001021408-25-003152",
+      "formType": "N-PX",
+      "filedAt": "2025-08-25T14:01:44-04:00",
+      "periodOfReport": "2025-06-30",
+      "cik": "884546",
+      "companyName": "CHARLES SCHWAB INVESTMENT MANAGEMENT INC",
+      "formData": {
+        "coverPage": {
+          "reportingPerson": {
+            "name": "Charles Schwab Investment Management Inc",
+            "address": {
+              "street1": "211 Main Street",
+              "city": "San Francisco",
+              "stateOrCountry": "CA",
+              "zipCode": "94105"
+            }
+          },
+          "reportInfo": {
+            "reportType": "INSTITUTIONAL MANAGER VOTING REPORT"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-npx-metadata.json)
+
+### Get Voting Records by Accession Number
+
+```python
 accessionNo = npx_filing_metadata[0]["accessionNo"]
 response = formNpxApi.get_voting_records(accessionNo)
 voting_records = response["proxyVotingRecords"]
 
 print(voting_records[0])
 ```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "id": "723cc6d725f186bd4436136332d7fc98",
+  "accessionNo": "0001021408-25-003152",
+  "formType": "N-PX",
+  "filedAt": "2025-08-25T14:01:44-04:00",
+  "periodOfReport": "2025-06-30",
+  "cik": "884546",
+  "companyName": "CHARLES SCHWAB INVESTMENT MANAGEMENT INC",
+  "proxyVotingRecords": [
+    {
+      "issuerName": "10x Genomics, Inc.",
+      "cusip": "88025U109",
+      "meetingDate": "06/03/2025",
+      "voteDescription": "To approve, on a non-binding, advisory basis, the compensation of our named executive officers.",
+      "voteCategories": {
+        "voteCategory": [{ "categoryType": "SECTION 14A SAY-ON-PAY VOTES" }]
+      },
+      "voteSource": "ISSUER",
+      "sharesVoted": 653315,
+      "vote": {
+        "voteRecord": [
+          {
+            "howVoted": "AGAINST",
+            "sharesVoted": 653315,
+            "managementRecommendation": "AGAINST"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-npx-voting-records.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-npx-proxy-voting-records-api
 
@@ -949,6 +2104,60 @@ query = {
 response = form_s1_424B4_api.get_data(query)
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 5, "relation": "eq" },
+  "data": [
+    {
+      "id": "f838c5f9775441d7aa3b04e087e0e469",
+      "filedAt": "2021-11-12T17:00:47-05:00",
+      "accessionNo": "0001193125-21-328239",
+      "formType": "424B4",
+      "cik": "1874178",
+      "ticker": "RIVN",
+      "entityName": "Rivian Automotive, Inc. / DE",
+      "tickers": [
+        { "ticker": "RIVN", "type": "Class A Common Stock", "exchange": "Nasdaq" }
+      ],
+      "securities": [
+        { "name": "153,000,000 Shares Class A Common Stock" },
+        { "name": "Class B common stock" }
+      ],
+      "publicOfferingPrice": { "perShare": 78, "total": 11934000000 },
+      "underwritingDiscount": { "perShare": 1.1098, "total": 169799400 },
+      "proceedsBeforeExpenses": { "perShare": 76.8902, "total": 11764200600 },
+      "underwriters": [
+        { "name": "Morgan Stanley & Co. LLC" },
+        { "name": "Goldman Sachs & Co. LLC" },
+        { "name": "J.P. Morgan Securities LLC" }
+      ],
+      "lawFirms": [
+        { "name": "Latham & Watkins LLP", "location": "" },
+        { "name": "Skadden, Arps, Slate, Meagher & Flom LLP", "location": "" }
+      ],
+      "auditors": [
+        { "name": "KPMG LLP" }
+      ],
+      "management": [
+        { "name": "Robert J. Scaringe", "age": 38, "position": "Founder and Chief Executive Officer, Chairman of the Board of Directors" },
+        { "name": "Claire McDonough", "age": 40, "position": "Chief Financial Officer" }
+      ],
+      "employees": {
+        "total": 9195,
+        "asOfDate": "2021-10-31"
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-s1-424b4.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-s1-424b4-data-search-api
 
@@ -973,6 +2182,55 @@ response = formCApi.get_data(search_params)
 print(response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "data": [
+    {
+      "id": "5ed83df80bfdb0dd611508c07e138867",
+      "accessionNo": "0002103209-26-000005",
+      "formType": "C/A",
+      "filedAt": "2026-03-31T18:45:06-04:00",
+      "cik": "2103209",
+      "companyName": "GigaWatt, Inc",
+      "issuerInformation": {
+        "issuerInfo": {
+          "nameOfIssuer": "GigaWatt, Inc.",
+          "legalStatus": {
+            "legalStatusForm": "Corporation",
+            "jurisdictionOrganization": "CA",
+            "dateIncorporation": "09-17-2025"
+          },
+          "issuerWebsite": "https://www.gigawattinc.com/"
+        }
+      },
+      "offeringInformation": {
+        "securityOfferedType": "Other",
+        "securityOfferedOtherDesc": "Class B Common Stock",
+        "noOfSecurityOffered": 10000,
+        "price": 2,
+        "offeringAmount": 20000,
+        "maximumOfferingAmount": 1235000,
+        "deadlineDate": "04-23-2026"
+      },
+      "annualReportDisclosureRequirements": {
+        "currentEmployees": 21,
+        "totalAssetMostRecentFiscalYear": 2559852,
+        "revenueMostRecentFiscalYear": 7485272,
+        "netIncomeMostRecentFiscalYear": 83037
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-c.json)
+
 > See the documentation for more details: https://sec-api.io/docs/form-c-crowdfunding-api
 
 ## Form D API
@@ -995,6 +2253,55 @@ response = formDApi.get_data(
 
 print(response["offerings"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "offerings": [
+    {
+      "schemaVersion": "X0708",
+      "submissionType": "D/A",
+      "primaryIssuer": {
+        "cik": "0001925002",
+        "entityName": "Fund I, a series of Material Ventures, LP",
+        "issuerAddress": {
+          "street1": "119 SOUTH MAIN STREET",
+          "city": "SEATTLE",
+          "stateOrCountry": "WA",
+          "zipCode": "98104"
+        },
+        "entityType": "Limited Partnership",
+        "yearOfInc": { "withinFiveYears": true, "value": "2021" }
+      },
+      "offeringData": {
+        "industryGroup": {
+          "industryGroupType": "Pooled Investment Fund",
+          "investmentFundInfo": { "investmentFundType": "Venture Capital Fund", "is40Act": false }
+        },
+        "federalExemptionsExclusions": { "item": ["06b", "3C", "3C.1"] },
+        "typesOfSecuritiesOffered": { "isPooledInvestmentFundType": true },
+        "minimumInvestmentAccepted": 25000,
+        "offeringSalesAmounts": {
+          "totalOfferingAmount": 10000000,
+          "totalAmountSold": 5254355,
+          "totalRemaining": 4745645
+        },
+        "investors": { "hasNonAccreditedInvestors": false, "totalNumberAlreadyInvested": 47 }
+      },
+      "accessionNo": "0001925002-26-000003",
+      "filedAt": "2026-03-31T20:56:04-04:00",
+      "id": "eafcfda4b7698259276857a92943d990"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-d.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-d-xml-json-api
 
@@ -1022,6 +2329,48 @@ offeringStatement = response["data"][0]
 print(offeringStatement)
 ```
 
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 1419, "relation": "eq" },
+  "data": [
+    {
+      "id": "af09549e0cb0775585c3481d61f8e471",
+      "accessionNo": "0001829126-24-008673",
+      "fileNo": "24R-00889",
+      "formType": "1-Z",
+      "filedAt": "2024-12-31T17:27:40-05:00",
+      "cik": "1973742",
+      "companyName": "Worldwide Stages, Inc.",
+      "item1": {
+        "issuerName": "Worldwide Stages, Inc.",
+        "street1": "5000 Northfield Lane",
+        "city": "Spring Hill",
+        "stateOrCountry": "TN",
+        "zipCode": "37174"
+      },
+      "summaryInfoOffering": [
+        {
+          "offeringQualificationDate": "08-10-2023",
+          "offeringSecuritiesQualifiedSold": 7500000,
+          "offeringSecuritiesSold": 3870,
+          "pricePerSecurity": 10,
+          "auditorSpName": ["Fruci & Associates II, PLLC"],
+          "legalSpName": ["Nelson Mullins Riley & Scarborough"],
+          "issuerNetProceeds": 25900.4
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/reg-a-search.json)
+
 > See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
 
 ### Form 1-A API
@@ -1043,6 +2392,46 @@ form1A = response["data"][0]
 
 print(form1A)
 ```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 1954, "relation": "eq" },
+  "data": [
+    {
+      "id": "3049ff20a7a655422f33f02c192c75bf",
+      "accessionNo": "0001493152-26-012984",
+      "formType": "1-A",
+      "filedAt": "2026-03-26T17:11:42-04:00",
+      "cik": "1587603",
+      "companyName": "WINNERS, INC.",
+      "issuerInfo": {
+        "street1": "401 RYLAND STREET",
+        "city": "RENO",
+        "stateOrCountry": "NV",
+        "totalAssets": 475537,
+        "totalLiabilities": 838770,
+        "totalRevenues": 495,
+        "netIncome": -978989
+      },
+      "summaryInfo": {
+        "indicateTier1Tier2Offering": "Tier1",
+        "financialStatementAuditStatus": "Unaudited",
+        "securitiesOfferedTypes": ["Equity (common or preferred stock)"],
+        "securitiesOffered": 10000000,
+        "pricePerSecurity": 0.5,
+        "totalAggregateOffering": 5000000
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/reg-a-form-1a.json)
 
 > See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
 
@@ -1066,6 +2455,47 @@ form1Ks = response["data"]
 print(form1Ks)
 ```
 
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 4, "relation": "eq" },
+  "data": [
+    {
+      "id": "9e7259d5bfcc20d7bdf19c7037ab1186",
+      "accessionNo": "0001493152-25-009865",
+      "formType": "1-K",
+      "filedAt": "2025-03-11T16:38:05-04:00",
+      "periodOfReport": "2024-12-31",
+      "cik": "1786471",
+      "companyName": "Aptera Motors Corp",
+      "item1": {
+        "formIndication": "Annual Report",
+        "fiscalYearEnd": "12-31-2024",
+        "city": "Carlsbad",
+        "stateOrCountry": "CA"
+      },
+      "summaryInfo": [
+        {
+          "commissionFileNumber": "024-11479",
+          "offeringQualificationDate": "05-19-2021",
+          "qualifiedSecuritiesSold": 14000000,
+          "offeringSecuritiesSold": 12630689,
+          "pricePerSecurity": 8.02,
+          "aggregrateOfferingPrice": 101297126,
+          "issuerNetProceeds": 99964154
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/reg-a-form-1k.json)
+
 > See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
 
 ### Form 1-Z API
@@ -1087,6 +2517,50 @@ form1Zs = response["data"]
 
 print(form1Zs)
 ```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 361, "relation": "eq" },
+  "data": [
+    {
+      "id": "9b9dfa9d1532fbe9150cea549881f0cc",
+      "accessionNo": "0001683168-26-002068",
+      "formType": "1-Z/A",
+      "filedAt": "2026-03-23T06:02:42-04:00",
+      "cik": "1585380",
+      "ticker": "INKW",
+      "companyName": "Greene Concepts, Inc",
+      "item1": {
+        "issuerName": "Greene Concepts, Inc.",
+        "city": "Marion",
+        "stateOrCountry": "NC"
+      },
+      "summaryInfoOffering": [
+        {
+          "offeringQualificationDate": "04-03-2023",
+          "offeringSecuritiesQualifiedSold": 4500000000,
+          "offeringSecuritiesSold": 3047136365,
+          "pricePerSecurity": 0.0006,
+          "issuerNetProceeds": 1932001
+        }
+      ],
+      "certificationSuspension": [
+        {
+          "securitiesClassTitle": "Common Stock",
+          "approxRecordHolders": 5050
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/reg-a-form-1z.json)
 
 > See the documentation for more details: https://sec-api.io/docs/reg-a-offering-statements-api
 
@@ -1111,6 +2585,50 @@ item_4_01_response = item_X_api.get_data(item_4_01_request)
 print(item_4_01_response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "data": [
+    {
+      "id": "7ed33db091e32b437ff9c4571531869d",
+      "accessionNo": "0001388658-26-000022",
+      "formType": "8-K",
+      "filedAt": "2026-03-31T19:49:16-04:00",
+      "periodOfReport": "2026-03-30",
+      "cik": "1388658",
+      "ticker": "IRTC",
+      "companyName": "iRhythm Holdings, Inc.",
+      "items": [
+        "Item 4.01: Changes in Registrant's Certifying Accountant",
+        "Item 9.01: Financial Statements and Exhibits"
+      ],
+      "item4_01": {
+        "keyComponents": "iRhythm Holdings, Inc. dismissed PricewaterhouseCoopers LLP as its independent auditor on March 30, 2026, and subsequently engaged KPMG LLP as the new auditor for the fiscal year ending December 31, 2026.",
+        "newAccountantDate": "2026-03-30",
+        "engagedNewAccountant": true,
+        "formerAccountantDate": "2026-03-30",
+        "engagementEndReason": "dismissal",
+        "formerAccountantName": "PricewaterhouseCoopers LLP",
+        "newAccountantName": "KPMG LLP",
+        "consultedNewAccountant": false,
+        "reportedDisagreements": false,
+        "reportableEventsExist": false,
+        "reportedIcfrWeakness": false,
+        "opinionType": "unqualified",
+        "approvedChange": true
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-8k-item-4-01.json)
+
 > See the documentation for more details: https://sec-api.io/docs/form-8k-data-item4-1-search-api
 
 ### Financial Restatements & Non-Reliance on Prior Financial Results (Item 4.02)
@@ -1131,6 +2649,48 @@ item_4_02_request = {
 item_4_02_response = item_X_api.get_data(item_4_02_request)
 print(item_4_02_response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 8546, "relation": "eq" },
+  "data": [
+    {
+      "id": "1153464e0d82cd42a5773bede05220a8",
+      "accessionNo": "0001765048-26-000002",
+      "formType": "8-K",
+      "filedAt": "2026-03-26T09:53:26-04:00",
+      "cik": "1765048",
+      "ticker": "GCGJ",
+      "companyName": "GUOCHUN INTERNATIONAL INC.",
+      "items": [
+        "Item 4.02: Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review"
+      ],
+      "item4_02": {
+        "keyComponents": "The Company determined that action should be taken to preclude reliance on previously issued unaudited condensed financial statements for the period ended September 30, 2025, due to an erroneously recorded amount in other general and administrative expenses.",
+        "identifiedIssues": [
+          "Erroneously recorded amount in other general and administrative expenses"
+        ],
+        "affectedReportingPeriods": ["Q3 2025"],
+        "identifiedBy": ["Company"],
+        "restatementIsNecessary": true,
+        "impactIsMaterial": false,
+        "materialWeaknessIdentified": false,
+        "affectedLineItems": [
+          "Other General and Administrative Expenses",
+          "Prepayments"
+        ]
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-8k-item-4-02.json)
 
 > See the documentation for more details: https://sec-api.io/docs/form-8k-data-search-api
 
@@ -1153,6 +2713,59 @@ item_5_02_response = item_X_api.get_data(item_5_02_request)
 print(item_5_02_response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "data": [
+    {
+      "id": "9589d3da16d0e3bd48e6ebb799dd9988",
+      "accessionNo": "0001193125-26-135660",
+      "formType": "8-K",
+      "filedAt": "2026-04-01T07:00:10-04:00",
+      "periodOfReport": "2026-04-01",
+      "cik": "1109354",
+      "ticker": "BRKR",
+      "companyName": "BRUKER CORP",
+      "items": [
+        "Item 5.02: Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers: Compensatory Arrangements of Certain Officers",
+        "Item 9.01: Financial Statements and Exhibits"
+      ],
+      "item5_02": {
+        "keyComponents": "Thierry L. Bernard was appointed as a new director to the Board of Bruker Corporation, expanding the Board to twelve directors.",
+        "personnelChanges": [
+          {
+            "type": "appointment",
+            "effectiveDate": "2026-04-01",
+            "positions": ["Director"],
+            "person": {
+              "name": "Thierry L. Bernard",
+              "positionsAtOtherCompanies": [
+                "CEO and Managing Director of QIAGEN N.V.",
+                "Board Member at Neogen Corporation"
+              ],
+              "academicAffiliations": [
+                "Sciences Po",
+                "LSE",
+                "Harvard Business School"
+              ]
+            },
+            "disagreements": false,
+            "interim": false
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/form-8k-item-5-02.json)
+
 > See the documentation for more details: https://sec-api.io/docs/form-8k-data-item5-2-search-api
 
 ## Directors & Board Members Data API
@@ -1174,6 +2787,49 @@ query = {
 response = directorsBoardMembersApi.get_data(query)
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 20, "relation": "eq" },
+  "data": [
+    {
+      "id": "42fe18db08211769589dc61fbd461443",
+      "filedAt": "2026-01-08T16:31:36-05:00",
+      "accessionNo": "0001308179-26-000008",
+      "cik": "320193",
+      "ticker": "AAPL",
+      "entityName": "Apple Inc.",
+      "directors": [
+        {
+          "name": "Alex Gorsky",
+          "position": "Former Chair and CEO, Johnson & Johnson; Director",
+          "age": "65",
+          "directorClass": "II",
+          "dateFirstElected": "2021",
+          "isIndependent": false,
+          "committeeMemberships": ["Nominating Committee", "People and Compensation Committee"],
+          "qualificationsAndExperience": ["executive leadership experience", "brand marketing expertise", "experience in health and technology"]
+        },
+        {
+          "name": "Tim Cook",
+          "position": "CEO; Chief Executive Officer",
+          "age": "65",
+          "dateFirstElected": "2011",
+          "committeeMemberships": [],
+          "qualificationsAndExperience": ["extensive executive leadership experience in the technology industry", "management of worldwide operations"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/directors-board-members.json)
 
 > See the documentation for more details: https://sec-api.io/docs/directors-and-board-members-data-api
 
@@ -1351,6 +3007,81 @@ print(response["data"])
 }
 ```
 
+## Audit Fees Data API
+
+Access audit fee data disclosed in proxy statements (DEF 14A), including fees paid to auditors for audit services, audit-related services, tax services, and other services.
+
+```python
+from sec_api import AuditFeesApi
+
+auditFeesApi = AuditFeesApi("YOUR_API_KEY")
+
+query = {
+    "query": "cik:1318605",
+    "from": "0",
+    "size": "10",
+    "sort": [{"filedAt": {"order": "desc"}}],
+}
+
+response = auditFeesApi.get_data(query)
+print(response["data"])
+```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "total": { "value": 10000, "relation": "gte" },
+  "data": [
+    {
+      "id": "a522dfd61d00caa01da0b4f4b38607c5",
+      "accessionNo": "0001717547-26-000026",
+      "formType": "DEF 14A",
+      "filedAt": "2026-04-01T08:33:43-04:00",
+      "periodOfReport": "2026-05-13",
+      "entities": [
+        {
+          "cik": "1717547",
+          "ticker": "BRSP",
+          "companyName": "BrightSpire Capital, Inc. (Filer)",
+          "irsNo": "384046290",
+          "fiscalYearEnd": "1231",
+          "stateOfIncorporation": "MD",
+          "sic": "6798 Real Estate Investment Trusts"
+        }
+      ],
+      "records": [
+        {
+          "year": 2025,
+          "auditFees": 1251363,
+          "auditRelatedFees": null,
+          "taxFees": null,
+          "allOtherFees": null,
+          "totalFees": 1251363,
+          "auditor": "Deloitte & Touche LLP"
+        },
+        {
+          "year": 2024,
+          "auditFees": 1487239,
+          "auditRelatedFees": null,
+          "taxFees": 714695,
+          "allOtherFees": null,
+          "totalFees": 2201934,
+          "auditor": "Ernst & Young"
+        }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/audit-fees.json)
+
+> See the documentation for more details: https://sec-api.io/docs/audit-fees-api
+
 ## SEC Enforcement Actions Database API
 
 Access and search SEC enforcement actions published from 1997 to present. The database includes information about the parties involved in the action, nature of charges and complaints, penalty amounts, requested reliefs, violated rules and regulations, and more.
@@ -1370,6 +3101,46 @@ search_params = {
 response = enforcementActionsApi.get_data(search_params)
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 137, "relation": "eq" },
+  "data": [
+    {
+      "id": "7efc54567587f7930a3e3c1919b5ed8e",
+      "releaseNo": "2024-212",
+      "releasedAt": "2024-12-20T17:25:11-05:00",
+      "url": "https://www.sec.gov/newsroom/press-releases/2024-212",
+      "title": "Tai Mo Shan to Pay $123 Million for Negligently Misleading Investors About Stability of Terra USD",
+      "summary": "The SEC charged Tai Mo Shan Limited with misleading investors about the stability of Terra USD and acting as a statutory underwriter for LUNA crypto assets, resulting in a $123 million settlement.",
+      "tags": ["disclosure fraud", "crypto", "unregistered securities"],
+      "entities": [
+        { "name": "Tai Mo Shan Limited", "type": "company", "role": "defendant" },
+        { "name": "Terraform Labs PTE Ltd.", "type": "company", "role": "other" }
+      ],
+      "hasAgreedToSettlement": true,
+      "penaltyAmounts": [
+        { "penaltyAmount": "73452756", "penaltyAmountText": "$73,452,756", "imposedOn": "Tai Mo Shan Limited" },
+        { "penaltyAmount": "36726378", "penaltyAmountText": "$36,726,378", "imposedOn": "Tai Mo Shan Limited" }
+      ],
+      "requestedRelief": [
+        "disgorgement of profits",
+        "prejudgment interest",
+        "civil penalties",
+        "cease and desist from violations"
+      ],
+      "violatedSections": ["registration and fraud provisions"]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/sec-enforcement-actions.json)
 
 > See the documentation for more details: https://sec-api.io/docs/sec-enforcement-actions-database-api
 
@@ -1393,6 +3164,50 @@ response = secLitigationsApi.get_data(searchRequest)
 print(response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 288, "relation": "eq" },
+  "data": [
+    {
+      "id": "d459bd679554a02194c7c5f272f138fa",
+      "releaseNo": "LR-26206",
+      "releasedAt": "2024-12-31T01:53:13-05:00",
+      "title": "Dale B. Chappell, et al.",
+      "subTitle": "SEC Charges Humanigen's CEO and Chief Scientific Officer with Insider Trading",
+      "summary": "The SEC has charged Humanigen's CEO Cameron Durrant and Chief Scientific Officer Dale B. Chappell with insider trading for selling company stock based on nonpublic information.",
+      "tags": ["insider trading", "biopharmaceutical", "antifraud"],
+      "entities": [
+        { "name": "Cameron Durrant", "type": "individual", "role": "defendant" },
+        { "name": "Dale B. Chappell", "type": "individual", "role": "defendant" },
+        { "name": "Humanigen, Inc.", "type": "company", "role": "other", "ticker": "HGENQ" }
+      ],
+      "requestedRelief": [
+        "permanent injunctions",
+        "disgorgement of ill-gotten gains with prejudgment interest",
+        "civil penalties",
+        "officer and director bars"
+      ],
+      "violatedSections": [
+        "Section 17(a) of the Securities Act of 1933",
+        "Section 10(b) of the Securities Exchange Act of 1934",
+        "Rule 10b-5"
+      ],
+      "parallelActionsTakenBy": [
+        "Department of Justice's Fraud Section",
+        "U.S. Attorney's Office for the District of New Jersey"
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/sec-litigation-releases.json)
+
 > See the documentation for more details: https://sec-api.io/docs/sec-litigation-releases-database-api
 
 ## SEC Administrative Proceedings Database API
@@ -1414,6 +3229,43 @@ searchRequest = {
 response = adminProceedingsApi.get_data(searchRequest)
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 711, "relation": "eq" },
+  "data": [
+    {
+      "id": "0ab80b58b2fcf40e7497aa0000759a37",
+      "releasedAt": "2024-12-31T12:19:45-05:00",
+      "releaseNo": ["34-102060", "AAER-4554"],
+      "fileNumbers": ["3-22386"],
+      "respondents": [
+        { "name": "Accell Audit & Compliance, PA", "type": "company", "role": "respondent" }
+      ],
+      "title": "ORDER INSTITUTING PUBLIC ADMINISTRATIVE PROCEEDINGS PURSUANT TO RULE 102(e) OF THE COMMISSION'S RULES OF PRACTICE, MAKING FINDINGS, AND IMPOSING REMEDIAL SANCTIONS",
+      "summary": "The SEC has instituted public administrative proceedings against Accell Audit & Compliance, PA, resulting in its suspension from appearing or practicing before the Commission due to its involvement in fraudulent financial reporting with Ignite International Brands, Ltd.",
+      "tags": ["fraudulent financial reporting", "accounting misconduct"],
+      "entities": [
+        { "name": "Accell Audit & Compliance, PA", "type": "company", "role": "respondent" },
+        { "name": "Ignite International Brands, Ltd.", "type": "company", "role": "related party" }
+      ],
+      "hasAgreedToSettlement": true,
+      "penaltyAmounts": [
+        { "penaltyAmount": "75000", "penaltyAmountText": "$75,000", "imposedOn": "Accell Audit & Compliance, PA" }
+      ],
+      "violatedSections": ["Section 10(b) of the Exchange Act", "Rule 10b-5"],
+      "orders": ["Accell is suspended from appearing or practicing before the Commission as an accountant."]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/sec-administrative-proceedings.json)
 
 > See the documentation for more details: https://sec-api.io/docs/sec-administrative-proceedings-database-api
 
@@ -1437,6 +3289,44 @@ response = aaerApi.get_data(query)
 print(response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 427, "relation": "eq" },
+  "data": [
+    {
+      "id": "b2dfd65355cdf4c4a629103a211882ce",
+      "dateTime": "2024-12-31T12:19:45-05:00",
+      "aaerNo": "AAER-4554",
+      "releaseNo": ["34-102060"],
+      "respondents": [
+        { "name": "Accell Audit & Compliance, PA", "type": "company" }
+      ],
+      "urls": [
+        { "type": "primary", "url": "https://www.sec.gov/files/litigation/admin/2024/34-102060.pdf" }
+      ],
+      "summary": "The SEC has instituted public administrative proceedings against Accell Audit & Compliance, PA, resulting in a suspension and a $75,000 penalty for failing to exercise due professional care in auditing Ignite International Brands, Ltd.'s financial statements.",
+      "tags": ["auditing misconduct", "fraudulent financial reporting"],
+      "entities": [
+        { "name": "Accell Audit & Compliance, PA", "type": "company", "role": "respondent" },
+        { "name": "Ignite International Brands, Ltd.", "type": "company", "role": "entity audited" }
+      ],
+      "hasAgreedToSettlement": true,
+      "penaltyAmounts": [
+        { "penaltyAmount": "75000", "penaltyAmountText": "$75,000", "imposedOn": "Accell Audit & Compliance, PA" }
+      ],
+      "violatedSections": ["Section 10(b) of the Exchange Act", "Rule 10b-5"]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/aaer.json)
+
 > See the documentation for more details: https://sec-api.io/docs/aaer-database-api
 
 ## SRO Filings Database API
@@ -1458,6 +3348,34 @@ query = {
 response = sroFilingsApi.get_data(query)
 print(response["data"])
 ```
+
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 7963, "relation": "eq" },
+  "data": [
+    {
+      "id": "dea4e1fa1371b4b91e08c7c3f5f42eae",
+      "releaseNumber": "34-105132",
+      "issueDate": "2026-03-31",
+      "fileNumber": "SR-NYSEAMER-2026-25",
+      "sro": "NYSE American LLC (NYSEAMER)",
+      "details": "Notice of Filing and Immediate Effectiveness of a Proposed Rule Change to Modify the NYSE American Options Fee Schedule...",
+      "commentsDue": "21 days after publication in the Federal Register.",
+      "urls": [
+        { "type": "34-105132", "url": "https://www.sec.gov/files/rules/sro/nyseamer/2026/34-105132.pdf" },
+        { "type": "Exhibit 5", "url": "https://www.sec.gov/files/rules/sro/nyseamer/2026/34-105132-ex5.pdf" }
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/sro-filings.json)
 
 > See the documentation for more details: https://sec-api.io/docs/sro-filings-database-api
 
@@ -1555,14 +3473,101 @@ response = edgarEntitiesApi.get_data(search_request)
 print(response["data"])
 ```
 
+<details>
+  <summary>Example Response</summary>
+  
+```json
+{
+  "total": { "value": 1, "relation": "eq" },
+  "data": [
+    {
+      "id": "1318605",
+      "cik": "1318605",
+      "name": "Tesla, Inc.",
+      "businessAddress": {
+        "street1": "1 TESLA ROAD",
+        "city": "AUSTIN",
+        "state": "TX",
+        "stateName": "TEXAS",
+        "zip": "78725"
+      },
+      "mailingAddress": {
+        "street1": "1 TESLA ROAD",
+        "city": "AUSTIN",
+        "state": "TX",
+        "stateName": "TEXAS",
+        "zip": "78725"
+      },
+      "stateOfIncorporation": "TX",
+      "phone": "512-516-8177",
+      "irsNo": "912197729",
+      "fiscalYearEnd": "1231",
+      "sic": "3711",
+      "sicLabel": "3711 MOTOR VEHICLES & PASSENGER CAR BODIES",
+      "formTypes": { "4": true, "144": true, "8-K": true, "10-Q": true, "10-K": true },
+      "filerCategory": "Large Accelerated Filer",
+      "currentReportingStatus": true,
+      "wellKnownSeasonedIssuer": true,
+      "auditorName": "PricewaterhouseCoopers LLP",
+      "auditorLocation": "San Jose, California"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/edgar-entities.json)
+
 > See the documentation for more details: https://sec-api.io/docs/edgar-entities-database-api
+
+## EDGAR Filings Ingestion Logs API
+
+Retrieve a log of all filings ingested from SEC EDGAR on a specific date. Returns accession numbers, form types, and filing timestamps for all filings published on the requested date. Data is available from December 2, 2025 onwards.
+
+```python
+from sec_api import EdgarIndexApi
+
+edgarIndexApi = EdgarIndexApi("YOUR_API_KEY")
+
+response = edgarIndexApi.get_ingestion_log("2025-12-02")
+print(response["data"])
+```
+
+<details>
+  <summary>Example Response</summary>
+
+```json
+{
+  "lastUpdatedAt": "2025-12-02T21:57:46-05:00",
+  "total": { "value": 3041, "relation": "eq" },
+  "data": [
+    {
+      "accessionNo": "0001193125-25-305761",
+      "formType": "S-1MEF",
+      "filedAt": "2025-12-02T21:57:17-05:00"
+    },
+    {
+      "accessionNo": "0001493152-25-025840",
+      "formType": "4",
+      "filedAt": "2025-12-02T21:56:21-05:00"
+    }
+  ]
+}
+```
+
+</details>
+
+[Full example response](https://github.com/janlukasschroeder/sec-api-python/blob/master/examples/api-responses/edgar-index-ingestion-log.json)
+
+> See the documentation for more details: https://sec-api.io/docs/edgar-index-apis
 
 ## Proxy Support
 
 In certain cases, your corporate IT infrastructure may encounter issues with HTTPS requests, leading to SSL certificate errors. To resolve this, HTTP and HTTPS proxies can be passed into all API wrappers as shown in the example below. If you're unsure about which proxies to use, please consult your company's IT administrator.
 
 ```python
-from sec_api import QueryApi, RenderApi, ...
+from sec_api import QueryApi, DownloadApi, ...
 
 proxies = {
   "http": "http://your-proxy.com",
@@ -1570,207 +3575,5 @@ proxies = {
 }
 
 queryApi = QueryApi(api_key="YOUR_API_KEY", proxies=proxies)
-renderApi = RenderApi(api_key="YOUR_API_KEY", proxies=proxies)
+downloadApi = DownloadApi(api_key="YOUR_API_KEY", proxies=proxies)
 ```
-
-## Query API Response Format
-
-- `accessionNo` (string) - Accession number of filing, e.g. 0000028917-20-000033
-- `cik` (string) - CIK of the filing issuer. Important: trailing `0` are removed.
-- `ticker` (string) - Ticker of company, e.g. AMOT. A ticker is not available when non-publicly traded companies report filings (e.g. form 4 reported by directors). Please contact us if you find filings that you think should have tickers (but don't).
-- `companyName` (string) - Name of company, e.g. Allied Motion Technologies Inc
-- `companyNameLong` (string) - Long version of company name including the filer type (Issuer, Filer, Reporting), e.g. ALLIED MOTION TECHNOLOGIES INC (0000046129) (Issuer)
-- `formType` (string) - sec.gov form type, e.g 10-K. [See the list of supported form types here.](https://sec-api.io/#list-of-sec-form-types)
-- `description` (string) - Description of the form, e.g. Statement of changes in beneficial ownership of securities
-- `linkToFilingDetails` (string) - Link to HTML, XML or PDF version of the filing.
-- `linkToTxt` (string) - Link to the plain text version of the filing. This file can be multiple MBs large.
-- `linkToHtml` (string) - Link to index page of the filing listing all exhibits and the original HTML file.
-- `linkToXbrl` (string, optional) - Link to XBRL version of the filing (if available).
-- `filedAt` (string) - The date (format: YYYY-MM-DD HH:mm:SS TZ) the filing was filed, eg 2019-12-06T14:41:26-05:00.
-- `periodOfReport` (string, if reported) - Period of report, e.g. 2021-06-08
-- `effectivenessDate` (string, if reported) - Effectiveness date, e.g. 2021-06-08
-- `registrationForm` (string, if reported) - Registration form as reported on EFFECT forms, e.g. S-1
-- `referenceAccessionNo` (string, if reported) - Reference accession number as reported on EFFECT forms, e.g. 0001213900-22-001446
-- `items` (array of strings, if reported) - Items represents an array of item strings as reported on form 8-K, 8-K/A, D, D/A, ABS-15G, ABS-15G/A, 1-U, 1-U/A. For example: `["Item 3.02: Unregistered Sales of Equity Securities", "Item 9.01: Financial Statements and Exhibits"]`
-- `groupMembers` (array, if reported) - Group members represents an array of member strings as reported on SC 13G, SC 13G/A, SC 13D, SC 13D/A filings, e.g. `[ "ALEC N. LITOWITZMAGNETAR CAPITAL PARTNERS LPSUPERNOVA MANAGEMENT LLC" ]`
-- `id` (string) - Unique ID of the filing.
-- `entities` (array) - A list of all entities referred to in the filing. The first item in the array always represents the filing issuer. Each array element is an object with the following keys:
-  - `companyName` (string) - Company name of the entity, e.g. DILLARD'S, INC. (Issuer)
-  - `cik` (string) - CIK of the entity. Trailing 0 are not removed here, e.g. 0000028917
-  - `irsNo` (string, optional) - IRS number of the entity, e.g. 710388071
-  - `stateOfIncorporation` (string, optional) - State of incorporation of entity, e.g. AR
-  - `fiscalYearEnd` (string, optional) - Fiscal year end of the entity, e.g. 0201
-  - `sic` (string, optional) - SIC of the entity, e.g. 5311 Retail-Department Stores
-  - `type` (string, optional) - Type of the filing being filed. Same as formType, e.g. 4
-  - `act` (string, optional) - The SEC act pursuant to which the filing was filed, e.g. 34
-  - `fileNo` (string, optional) - Filer number of the entity, e.g. 001-06140
-  - `filmNo` (string, optional) - Film number of the entity, e.g. 20575664
-- `documentFormatFiles` (array) - An array listing all primary files of the filing. The first item of the array is always the filing itself. The last item of the array is always the TXT version of the filing. All other items can represent exhibits, press releases, PDF documents, presentations, graphics, XML files, and more. An array item is represented as follows:
-  - `sequence` (string, optional) - The sequence number of the filing, e.g. 1
-  - `description` (string, optional) - Description of the file, e.g. EXHIBIT 31.1
-  - `documentUrl` (string) - URL to the file on SEC.gov
-  - `type` (string, optional) - Type of the file, e.g. EX-32.1, GRAPHIC or 10-Q
-  - `size` (string, optional) - Size of the file, e.g. 6627216
-- `dataFiles` (array) - List of data files (filing attachments, exhibits, XBRL files) attached to the filing.
-  - `sequence` (string) - Sequence number of the file, e.g. 6
-  - `description` (string) - Description of the file, e.g. XBRL INSTANCE DOCUMENT
-  - `documentUrl` (string) - URL to the file on SEC.gov
-  - `type` (string, optional) - Type of the file, e.g. EX-101.INS, EX-101.DEF or EX-101.PRE
-  - `size` (string, optional) - Size of the file, e.g. 6627216
-- `seriesAndClassesContractsInformation` (array) - List of series and classes/contracts information
-  - `series` (string) - Series ID, e.g. S000001297
-  - `name` (string) - Name of entity, e.g. PRUDENTIAL ANNUITIES LIFE ASSUR CORP VAR ACCT B CL 1 SUB ACCTS
-  - `classesContracts` (array) - List of classes/contracts. Each list item has the following keys:
-    - `classContract` (string) - Class/Contract ID, e.g. C000011787
-    - `name` (string) - Name of class/contract entity, e.g. Class L
-    - `ticker` (string) - Ticker class/contract entity, e.g. URTLX
-
-### 13F Institutional Ownerships
-
-13F filings report institutional ownerships. Each 13F filing has an attribute `holdings` (array). An array item in holdings represents one holding and has the following attributes:
-
-- `nameOfIssuer` (string) - Name of issuer, e.g. MICRON TECHNOLOGY INC
-- `titleOfClass` (string) - Title of class, e.g. COM
-- `cusip` (string) - CUSIP of security, e.g. 98850P109
-- `value` (integer) - Absolute holding value in $, e.g. 18000. Note: `value` doesn't have to be multiplied by 1000 anymore. It's done by our API automatically.
-- `shrsOrPrnAmt` (object)
-  - `sshPrnamt` (integer) - Shares or PRN AMT, e.g. 345
-  - `sshPrnamtType` (string) - Share/PRN type, e.g. "SH"
-- `putCall` (string, optional) - Put / Call, e.g. Put
-- `investmentDiscretion` (string) - Investment discretion, e.g. "SOLE"
-- `otherManager` (string, optional) - Other manager, e.g. 7
-- `votingAuthority` (object)
-  - `Sole` (integer) - Sole, e.g. 345
-  - `Shared` (integer) - Shared, e.g. 345
-  - `None` (integer) - None, e.g. 345
-
-### Query API Example JSON Response
-
-```json
-{
-  "id": "79ad9e452ea42402df4fe55c636191d6",
-  "accessionNo": "0001213900-21-032169",
-  "cik": "1824149",
-  "ticker": "JOFF",
-  "companyName": "JOFF Fintech Acquisition Corp.",
-  "companyNameLong": "JOFF Fintech Acquisition Corp. (Filer)",
-  "formType": "10-Q",
-  "description": "Form 10-Q - Quarterly report [Sections 13 or 15(d)]",
-  "filedAt": "2021-06-11T17:25:44-04:00",
-  "linkToTxt": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/0001213900-21-032169.txt",
-  "linkToHtml": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/0001213900-21-032169-index.htm",
-  "linkToXbrl": "",
-  "linkToFilingDetails": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321_jofffintech.htm",
-  "entities": [
-    {
-      "companyName": "JOFF Fintech Acquisition Corp. (Filer)",
-      "cik": "1824149",
-      "irsNo": "852863893",
-      "stateOfIncorporation": "DE",
-      "fiscalYearEnd": "1231",
-      "type": "10-Q",
-      "act": "34",
-      "fileNo": "001-40005",
-      "filmNo": "211012398",
-      "sic": "6770 Blank Checks"
-    }
-  ],
-  "documentFormatFiles": [
-    {
-      "sequence": "1",
-      "description": "QUARTERLY REPORT",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321_jofffintech.htm",
-      "type": "10-Q",
-      "size": "274745"
-    },
-    {
-      "sequence": "2",
-      "description": "CERTIFICATION",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321ex31-1_jofffintech.htm",
-      "type": "EX-31.1",
-      "size": "12209"
-    },
-    {
-      "sequence": "3",
-      "description": "CERTIFICATION",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321ex31-2_jofffintech.htm",
-      "type": "EX-31.2",
-      "size": "12220"
-    },
-    {
-      "sequence": "4",
-      "description": "CERTIFICATION",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321ex32-1_jofffintech.htm",
-      "type": "EX-32.1",
-      "size": "4603"
-    },
-    {
-      "sequence": "5",
-      "description": "CERTIFICATION",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/f10q0321ex32-2_jofffintech.htm",
-      "type": "EX-32.2",
-      "size": "4607"
-    },
-    {
-      "sequence": " ",
-      "description": "Complete submission text file",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/0001213900-21-032169.txt",
-      "type": " ",
-      "size": "2344339"
-    }
-  ],
-  "dataFiles": [
-    {
-      "sequence": "6",
-      "description": "XBRL INSTANCE FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331.xml",
-      "type": "EX-101.INS",
-      "size": "248137"
-    },
-    {
-      "sequence": "7",
-      "description": "XBRL SCHEMA FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331.xsd",
-      "type": "EX-101.SCH",
-      "size": "43550"
-    },
-    {
-      "sequence": "8",
-      "description": "XBRL CALCULATION FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331_cal.xml",
-      "type": "EX-101.CAL",
-      "size": "21259"
-    },
-    {
-      "sequence": "9",
-      "description": "XBRL DEFINITION FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331_def.xml",
-      "type": "EX-101.DEF",
-      "size": "182722"
-    },
-    {
-      "sequence": "10",
-      "description": "XBRL LABEL FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331_lab.xml",
-      "type": "EX-101.LAB",
-      "size": "309660"
-    },
-    {
-      "sequence": "11",
-      "description": "XBRL PRESENTATION FILE",
-      "documentUrl": "https://www.sec.gov/Archives/edgar/data/1824149/000121390021032169/joff-20210331_pre.xml",
-      "type": "EX-101.PRE",
-      "size": "186873"
-    }
-  ],
-  "seriesAndClassesContractsInformation": [],
-  "periodOfReport": "2021-03-31",
-  "effectivenessDate": "2021-03-31"
-}
-```
-
-## Contact
-
-Let us know how we can improve the library or if you have any feature suggestions. We're happy to implement them.
-
-support@sec-api.io

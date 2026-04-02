@@ -5,7 +5,7 @@ import time
 
 query_api_endpoint = "https://api.sec-api.io"
 full_text_search_api_endpoint = "https://api.sec-api.io/full-text-search"
-filing_download_api_endpoint = "https://archive.sec-api.io"
+filing_download_api_endpoint = "https://edgar-mirror.sec-api.io"
 pdf_generator_api_endpoint = "https://api.sec-api.io/filing-reader"
 xbrl_api_endpoint = "https://api.sec-api.io/xbrl-to-json"
 extractor_api_endpoint = "https://api.sec-api.io/extractor"
@@ -50,6 +50,8 @@ sro_search_endpoint = "https://api.sec-api.io/sro"
 #
 mapping_api_endpoint = "https://api.sec-api.io/mapping"
 edgar_entities_endpoint = "https://api.sec-api.io/edgar-entities"
+audit_fees_endpoint = "https://api.sec-api.io/audit-fees"
+edgar_index_ingestion_log_endpoint = "https://api.sec-api.io/edgar-index/ingestion-log"
 
 
 def handle_api_error(response):
@@ -119,7 +121,7 @@ class RenderApi:
     Base class for Render API
     """
 
-    def __init__(self, api_key, proxies=None):
+    def __init__(self, api_key="", proxies=None):
         self.api_key = api_key
         self.api_endpoint = filing_download_api_endpoint
         self.proxies = proxies if proxies else {}
@@ -163,6 +165,14 @@ class RenderApi:
                 handle_api_error(response)
         else:
             handle_api_error(response)
+
+
+class DownloadApi(RenderApi):
+    """
+    Download API for SEC EDGAR filings, exhibits and attached files.
+    Alias for RenderApi, provided for consistency with the JavaScript SDK.
+    """
+    pass
 
 
 class PdfGeneratorApi:
@@ -820,6 +830,36 @@ class FormAdvApi:
         else:
             handle_api_error(response)
 
+    def get_other_business_names(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-d-1-b/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
+    def get_separately_managed_accounts(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-d-5-k/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
+    def get_financial_industry_affiliations(self, crd):
+        api_endpoint = (
+            form_adv_endpoint
+            + "/schedule-d-7-a/"
+            + str(crd)
+            + "?token="
+            + self.api_key
+        )
+        return self.get_request_wrapper(api_endpoint)
+
     def get_brochures(self, crd):
         api_endpoint = (
             form_adv_endpoint + "/brochures/" + str(crd) + "?token=" + self.api_key
@@ -1223,6 +1263,65 @@ class Item_4_02_Api:
             response = requests.post(
                 self.api_endpoint, json=query, proxies=self.proxies
             )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class AuditFeesApi:
+    """
+    Base class for Audit Fees Data API
+    https://sec-api.io/docs/audit-fees-api
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = audit_fees_endpoint + "?token=" + api_key
+        self.proxies = proxies if proxies else {}
+
+    def get_data(self, query):
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.post(
+                self.api_endpoint, json=query, proxies=self.proxies
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 429:
+                # wait 500 * (x + 1) milliseconds and try again
+                time.sleep(0.5 * (x + 1))
+            else:
+                handle_api_error(response)
+        else:
+            handle_api_error(response)
+
+
+class EdgarIndexApi:
+    """
+    Base class for EDGAR Filings Ingestion Logs API
+    https://sec-api.io/docs/edgar-index-apis
+    """
+
+    def __init__(self, api_key, proxies=None):
+        self.api_key = api_key
+        self.api_endpoint = edgar_index_ingestion_log_endpoint
+        self.proxies = proxies if proxies else {}
+
+    def get_ingestion_log(self, date):
+        url = self.api_endpoint + "/" + date + "?token=" + self.api_key
+        response = {}
+
+        # use backoff strategy to handle "too many requests" error.
+        for x in range(3):
+            response = requests.get(url, proxies=self.proxies)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:

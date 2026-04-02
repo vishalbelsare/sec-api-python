@@ -2,6 +2,7 @@ name = "sec_api"
 from sec_api.index import QueryApi
 from sec_api.index import FullTextSearchApi
 from sec_api.index import RenderApi
+from sec_api.index import DownloadApi
 from sec_api.index import PdfGeneratorApi
 
 # Extractor & Converter APIs
@@ -50,6 +51,12 @@ from sec_api.index import SecLitigationsApi
 from sec_api.index import SecAdministrativeProceedingsApi
 from sec_api.index import AaerApi
 from sec_api.index import SroFilingsApi
+
+# Public Company Data
+from sec_api.index import AuditFeesApi
+
+# EDGAR Index
+from sec_api.index import EdgarIndexApi
 
 # Other APIs
 from sec_api.index import EdgarEntitiesApi

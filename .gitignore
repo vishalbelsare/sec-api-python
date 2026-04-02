@@ -1,5 +1,6 @@
 venv
 env
+.env
 dist
 build
 .idea
@@ -8,3 +9,6 @@ sec_api.egg-info
 deploy.sh
 sec_api/__pycache__
 requirements.txt
+tmp
+.superseded
+TODO.md
