@@ -25,6 +25,8 @@ The full API documentation is available at [sec-api.io/docs](https://sec-api.io/
 pip install sec-api
 ```
 
+Get your free API key on [sec-api.io](https://sec-api.io/signup) and replace `YOUR_API_KEY` with it.
+
 **Download EDGAR Filings and Exhibits**
 
 ```python
@@ -40,7 +42,18 @@ data = downloadApi.get_file(filing_url)
 print(data[:1000])
 ```
 
-Get your free API key on [sec-api.io](https://sec-api.io/signup) and replace `YOUR_API_KEY` with it.
+**Download Entire Datasets of SEC Filings**
+
+```python
+from sec_api import Datasets
+
+datasets = Datasets(api_key="YOUR_API_KEY")
+
+# downloads all 10-K filings (1993-present) to ./sec-api-datasets/form-10k-content/YYYY/YYYY-MM.zip
+datasets.download("form-10k-content")
+# all 13-F institutional holdings
+datasets.download("form-13f-holdings")
+```
 
 ## Feature Overview
 
