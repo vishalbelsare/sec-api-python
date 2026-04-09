@@ -58,6 +58,9 @@ from sec_api.index import AuditFeesApi
 # EDGAR Index
 from sec_api.index import EdgarIndexApi
 
+# Bulk Datasets
+from sec_api.index import Datasets
+
 # Other APIs
 from sec_api.index import EdgarEntitiesApi
 from sec_api.index import MappingApi

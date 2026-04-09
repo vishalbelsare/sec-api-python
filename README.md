@@ -499,9 +499,9 @@ Variants such as `ConsolidatedStatementsofOperations` or `ConsolidatedStatements
 There are 3 ways to convert XBRL to JSON:
 
 - `htm_url`: Provide the URL of the filing ending with `.htm`.
-  Example URL: https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm
+  Example URL: [sec.gov/.../tsla-10k_20201231.htm](https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm)
 - `xbrl_url`: Provide the URL of the XBRL file ending with `.xml`. The XBRL file URL can be found in the `dataFiles` array returned by our query API. The array item has the description `EXTRACTED XBRL INSTANCE DOCUMENT` or similar.
-  Example URL: https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231_htm.xml
+  Example URL: [sec.gov/.../tsla-10k_20201231_htm.xml](https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231_htm.xml)
 - `accession_no`: Provide the accession number of the filing, e.g. `0001564590-21-004599`
 
 ```python
@@ -775,13 +775,186 @@ Download complete datasets for offline analysis and large-scale processing. All 
 | Form 10-Q - Quarterly Reports                       | 10-Q, 10-Q/A                | 1993-present | ZIP (HTML, TXT)      |
 | Form 8-K Exhibit 99 - Press Releases                | 8-K, 8-K/A                  | 1994-present | ZIP (HTML, TXT, PDF) |
 | Earnings Results (Item 2.02)                        | 8-K, 8-K/A                  | 2004-present | ZIP (HTML, TXT, PDF) |
-| Form 3 - Initial Ownership                          | 3, 3/A                      | 2009-present | JSONL                |
 | Form 4 - Changes in Ownership                       | 4, 4/A                      | 2009-present | JSONL                |
-| Form 5 - Annual Ownership                           | 5, 5/A                      | 2009-present | JSONL                |
 | Form 13F - Institutional Holdings                   | 13F-HR, 13F-HR/A            | 2013-present | JSONL                |
 | Form N-PORT - Fund Holdings                         | NPORT, NPORT/A              | 2019-present | JSONL                |
 | Form DEF 14A - Proxy Statements                     | DEF 14A                     | 1994-present | ZIP (HTML, TXT)      |
 | [View all datasets...](https://sec-api.io/datasets) |                             |              |                      |
+
+### Download a Dataset
+
+Downloads are atomic (written to a `.tmp` file first, renamed on completion), so interrupted downloads are automatically resumed on the next run. Only new or updated files are downloaded — existing files are skipped if their size matches the remote. This makes it easy to keep a local copy of any dataset in sync with a single line of code.
+
+```python
+from sec_api import Datasets
+
+datasets = Datasets(api_key="YOUR_API_KEY")
+
+# first run: downloads all containers to ./sec-api-datasets/form-10k-content/
+datasets.download("form-10k-content")
+
+# subsequent runs: only downloads new or updated containers, skips the rest
+datasets.sync("form-10k-content")
+
+# specify a custom directory
+datasets.download("form-10k-content", path="./my-data/form-10k-content")
+```
+
+Alternatively, download the entire dataset as a single ZIP file:
+
+```python
+datasets.download("form-10k-content", strategy="zip")
+```
+
+Set up a daily cron job or scheduled task to keep your local dataset up to date:
+
+```python
+# sync.py - run daily via cron, e.g.: 0 6 * * * python sync.py
+from sec_api import Datasets
+
+datasets = Datasets(api_key="YOUR_API_KEY")
+datasets.sync("form-10k-content", path="./my-data/form-10k-content")
+```
+
+### List Available Datasets
+
+```python
+from sec_api import Datasets
+
+datasets = Datasets()
+
+# no API key required - returns raw JSON list
+all_datasets = datasets.get_all()
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+[
+  {
+    "datasetId": "1f11ba9b-e03a-6950-a464-a23fcc53ee6f",
+    "datasetIdInUrl": "audit-fees",
+    "name": "Audit Fees",
+    "description": "Structured dataset of annual audit fees extracted from SEC filings...",
+    "formTypes": ["DEF 14A"],
+    "containerFormat": ".jsonl.gz",
+    "fileTypes": ["JSONL"],
+    "updatedAt": "2026-04-09T05:00:01.000Z",
+    "earliestSampleDate": "2001-03-01",
+    "totalRecords": null,
+    "totalSize": 9792910
+  },
+  {
+    "datasetId": "1f12abbc-262c-65a0-8b3e-1288c41dcc76",
+    "datasetIdInUrl": "earnings-results-form-8-k-item-2-02",
+    "name": "Earnings Results - Form 8-K, Item 2.02 (2004-Present)",
+    "description": "The Form 8-K Item 2.02 Results Dataset contains all disclosures filed on EDGAR...",
+    "formTypes": ["8-K", "8-K/A"],
+    "containerFormat": "ZIP",
+    "fileTypes": ["HTML", "JSON", "TXT", "GIF", "JPG", "PDF"],
+    "updatedAt": "2026-04-09T07:07:44.885Z",
+    "earliestSampleDate": "2004-08-01",
+    "totalRecords": 2242018,
+    "totalSize": 154607640756
+  }
+]
+```
+
+</details>
+
+<br>
+
+Or use `show_all()` for formatted terminal output:
+
+```python
+datasets.show_all()
+```
+
+```
+  ID                                                 Name                                                    Format             Size
+  ────────────────────────────────────────────────── ─────────────────────────────────────────────────────── ────────── ────────────
+  audit-fees                                         Audit Fees                                              .jsonl.gz        9.8 MB
+  earnings-results-form-8-k-item-2-02                Earnings Results - Form 8-K, Item 2.02 (2004-Present)   ZIP            154.6 GB
+  form-10k-content                                   Form 10-K - Annual Reports - Filing Contents            ZIP             33.8 GB
+  form-4                                             Form 4 – Statement of Changes in Beneficial Ownership   .jsonl.gz      912.2 MB
+  ...
+
+  28 datasets available. Browse all at https://sec-api.io/datasets
+```
+
+### Get Dataset Details
+
+```python
+# returns raw JSON dict
+details = datasets.get_dataset_details("form-10k-content")
+```
+
+<details>
+  <summary>Example Response (shortened)</summary>
+
+```json
+{
+  "datasetId": "1f11bb55-d58b-6080-bace-e7a62567f4b9",
+  "datasetDownloadUrl": "https://api.sec-api.io/datasets/form-10k-content.zip",
+  "name": "Form 10-K - Annual Reports - Filing Contents",
+  "description": "HTML and TXT files of all Form 10-K filings published since 1993...",
+  "updatedAt": "2026-04-09T07:07:57.058Z",
+  "earliestSampleDate": "1993-10-01",
+  "totalRecords": 303021,
+  "totalSize": 33809939825,
+  "formTypes": [
+    "10-K",
+    "10-K/A",
+    "10-K405",
+    "10-K405/A",
+    "10-KSB",
+    "10-KSB/A",
+    "10-KT",
+    "10-KT/A"
+  ],
+  "containerFormat": "ZIP",
+  "fileTypes": ["TXT", "JSON", "HTML", "PAPER"],
+  "containers": [
+    {
+      "downloadUrl": "https://api.sec-api.io/datasets/form-10k-content/2026/2026-04.zip",
+      "key": "2026/2026-04.zip",
+      "size": 15593008,
+      "records": 167,
+      "updatedAt": "2026-04-09T07:07:57.058Z"
+    },
+    {
+      "downloadUrl": "https://api.sec-api.io/datasets/form-10k-content/2026/2026-03.zip",
+      "key": "2026/2026-03.zip",
+      "size": 616726590,
+      "records": 6468,
+      "updatedAt": "2026-04-02T02:52:01.741Z"
+    }
+  ]
+}
+```
+
+</details>
+
+<br>
+
+Or use `show_dataset_details()` for formatted terminal output:
+
+```python
+datasets.show_dataset_details("form-10k-content")
+```
+
+```
+  Name:             Form 10-K - Annual Reports - Filing Contents
+  Description:      HTML and TXT files of all Form 10-K filings published since 1993...
+  Updated:          2026-04-09T07:07:57.058Z
+  Earliest data:    1993-10-01
+  Form types:       10-K, 10-K/A, 10-K405, 10-K405/A, 10-KSB, 10-KSB/A, 10-KT, 10-KT/A
+  Format:           ZIP
+  Total records:    303,021
+  Total size:       33.8 GB
+  Containers:       390
+```
 
 ## Form ADV API
 

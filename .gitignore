@@ -12,3 +12,4 @@ requirements.txt
 tmp
 .superseded
 TODO.md
+.claude

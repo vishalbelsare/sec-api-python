@@ -55,6 +55,7 @@ from sec_api import (
     EdgarEntitiesApi,
     AuditFeesApi,
     EdgarIndexApi,
+    Datasets,
 )
 
 passed = 0
@@ -645,6 +646,28 @@ def test_edgar_index():
     assert result["data"] and len(result["data"]) > 0, "No data returned"
 
 test("get_ingestion_log returns filings for a date", test_edgar_index)
+
+
+# ── Datasets API ──────────────────────────────────────────
+
+print("\nDatasets API")
+datasets = Datasets(api_key=api_key)
+
+def test_datasets_get_all():
+    result = datasets.get_all()
+    assert isinstance(result, list), "Expected list"
+    assert len(result) > 0, "No datasets returned"
+    assert "datasetIdInUrl" in result[0], "Missing datasetIdInUrl"
+
+test("get_all returns available datasets", test_datasets_get_all)
+
+def test_datasets_get_details():
+    result = datasets.get_dataset_details("audit-fees")
+    assert "datasetId" in result, "Missing datasetId"
+    assert "containers" in result, "Missing containers"
+    assert len(result["containers"]) > 0, "No containers"
+
+test("get_dataset_details returns dataset details", test_datasets_get_details)
 
 
 # ── Summary ───────────────────────────────────────────────
