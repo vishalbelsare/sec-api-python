@@ -1,21 +1,13 @@
-<!-- # SEC API - Access SEC and EDGAR Data with Python
-
-[![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api) [![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs) -->
-
 # SEC-API.io Python Library
 
-<a href="https://sec-api.io/docs"><img src="https://sec-api.io/favicon.svg" alt="" width="48" align="left"/></a>
-
-**The industry-standard for SEC & EDGAR data**, trusted by the world's largest hedge funds, investment banks, exchanges, law firms, and universities. Developed by PhDs in finance and physics.
-
-<br clear="left"/>
+![banner](https://sec-api.io/v2/media/product/gh-repo-banner-card-1500x400.png)
 
 [![Documentation](https://img.shields.io/badge/Documentation-sec--api.io-blue)](https://sec-api.io/docs) [![Downloads](https://pepy.tech/badge/sec-api)](https://pepy.tech/project/sec-api)
 
-- **20+ million EDGAR filings** and **100+ million exhibits** — from investor presentations, credit agreements, M&A, government contracts, and executive employment agreements to board composition and subsidiaries
-- **800,000+ entities, survivorship-bias free** — covers every SEC-regulated filer that ever reported, including delisted companies, dissolved funds, terminated advisors, and entities no longer reporting. From insiders and public/private companies to ETFs, mutual funds, hedge funds, foreign private issuers, BDCs, REITs, shell companies, and more
-- **All 500+ EDGAR form types** — annual and quarterly reports (10-K, 10-Q, 20-F, 40-F), proxy statements (DEF 14A) and voting records, registration statements and prospectuses, and everything in between, including form types no longer in use
-- **Full historical time range** — from 1993 to present, with data updated in real-time
+- **20+ million EDGAR filings** and **100+ million exhibits** — from license agreements, investor presentations, and other Reg FD disclosures, over insider trading, credit & bond agreements, bylaws, IPOs, secondaries & shelf offerings, M&A terms, government contracts, audit reports, SEC enforcement actions, AAERs, and executive employment agreements to board composition, subsidiaries, public float and cybersecurity incidents.
+- **1.1M+ entities, survivorship-bias free** — covers every SEC-regulated filer that ever reported, including delisted companies, dissolved funds, terminated advisors, and entities no longer reporting. From insiders and public/private companies to financial advisors, ETFs, mutual funds, hedge funds, money-market funds, institutional investors, foreign private issuers, BDCs, REITs, shell companies, brokers, dealers, asset-backed securities issuers, SROs, and more.
+- **All 500+ EDGAR form types** — annual and quarterly reports (10-K, 10-Q, 20-F, 40-F), proxy voting statements (DEF 14A, PRE 14) and voting records, registration statements and prospectuses, and everything in between, including form types no longer in use.
+- **Full historical time range** — from 1993 to present, with data updated in real-time.
 
 The full API documentation is available at [sec-api.io/docs](https://sec-api.io/docs).
 
